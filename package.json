@@ -11,11 +11,23 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "babel-loader": "^8.1.0",
     "jquery": "^3.5.1",
     "paper": "^0.12.11"
   },
   "devDependencies": {
     "@types/jquery": "^3.5.1",
+    "css-loader": "^4.3.0",
+    "file-loader": "^6.1.0",
+    "image-webpack-loader": "^7.0.0",
+    "mini-css-extract-plugin": "^0.11.1",
+    "node-sass": "^4.14.1",
+    "optimize-css-assets-webpack-plugin": "^5.0.4",
+    "sass": "^1.26.10",
+    "sass-loader": "^10.0.2",
+    "style-loader": "^1.2.1",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   }

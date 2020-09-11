@@ -3,7 +3,8 @@
   <meta charset="utf-8" />
 
   <head>
-    <link rel="stylesheet" type="text/css" href="../assets/styles.css" />
+    <link rel="stylesheet" type="text/css" href="normalize.css" />
+    <link rel="stylesheet" type="text/css" href="styles.scss" />
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
     <script src="bundle.js"></script>
     <!-- <script src="keymaster.js"></script> -->
@@ -11,6 +12,7 @@
   </head>
 
   <body>
+    <canvas id="game-canvas" data-paper-resize="true"></canvas>
     <div id="mars">
       <div class="overlay"></div>
       <img
@@ -33,6 +35,5 @@
       </div>
       <canvas></canvas>
     </div>
-    <canvas id="game-canvas" data-paper-resize="true"></canvas>
   </body>
 </html>

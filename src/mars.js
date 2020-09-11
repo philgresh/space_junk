@@ -3,21 +3,22 @@ import Station from './objs/station';
 const MARS_SIZE = 0.1; // Percent of screen width
 
 export default class Mars {
-  constructor($marsCanvas) {
-    this.ctx = $marsCanvas.getContext('2d');
-    this.width = $marsCanvas.width;
-    this.height = $marsCanvas.height;
+  constructor(paperScope) {
+    const canvas = paperScope.project.view.element;
+    this.ctx = canvas.getContext('2d');
+    this.width = canvas.width;
+    this.height = canvas.height;
 
     // Set constants
     this.CENTER_X = this.width / 2;
     this.CENTER_Y = this.height / 2;
     this.MARS_RADIUS = this.width * MARS_SIZE;
     this.ATMOSPHERE_RADIUS = this.MARS_RADIUS * 1.4;
-    this.resizeMars();
+    this.resizeMars(canvas);
     this.renderBackgroundGradient();
     this.renderForegroundGradients();
     // this.renderShadow();
-    this.station1 = new Station($('.station-parent'));
+    // this.station1 = new Station($('.station-parent'));
 
     window.addEventListener('resize', this.resizeCanvas);
   }
@@ -107,11 +108,11 @@ export default class Mars {
     this.ctx.closePath();
   }
 
-  resizeCanvas() {
+  resizeCanvas(canvas) {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    $marsCanvas.width = window.innerWidth;
-    $marsCanvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
   }
 
   resizeMars() {
