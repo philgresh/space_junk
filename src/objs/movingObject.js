@@ -1,4 +1,4 @@
-import { straightLineDistance, genID } from './util';
+import { straightLineDistance, genID } from '../util';
 
 function createGradient(ctx, pos, radius, z) {
   const [x, y] = pos;

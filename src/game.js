@@ -1,5 +1,5 @@
-import Asteroid from './asteroid.js';
-import Ship from './ship';
+import Asteroid from './objs/asteroid';
+import Ship from './objs/ship';
 
 class Game {
   constructor(width, height, numAsteroids = 20) {
@@ -25,7 +25,6 @@ class Game {
         this.remove(i);
         // console.log('object removed', this);
       } else {
-
         // create clones for almost-off-screen
 
         // check for collisions
@@ -35,8 +34,7 @@ class Game {
         obj.draw(ctx);
         i++;
       }
-
-    };
+    }
   }
   cloneSideObjs(obj) {
     let [x, y] = obj.pos;
@@ -45,7 +43,8 @@ class Game {
     //   (x - radius < 0) ||
     //   (y + radius > this.DIM_Y) ||
     //   (y - radius < 0)
-    if (x + radius > this.DIM_X) { // Moving off to the right
+    if (x + radius > this.DIM_X) {
+      // Moving off to the right
       const pos = 0 - this.DIM_X;
       console.log(pos);
       // if (this.allObjects.includes())
@@ -54,7 +53,6 @@ class Game {
       // })
     }
   }
-
 
   checkCollisionsOnObj(obj) {
     const allObjs = this.allObjects;
@@ -105,10 +103,10 @@ class Game {
 
   _isCompletelyOffScreen({ pos: [x, y], radius }) {
     return (
-      (x - radius > this.DIM_X) ||
-      (x + radius < 0) ||
-      (y - radius > this.DIM_Y) ||
-      (y + radius < 0)
+      x - radius > this.DIM_X ||
+      x + radius < 0 ||
+      y - radius > this.DIM_Y ||
+      y + radius < 0
     );
   }
 
@@ -122,12 +120,10 @@ class Game {
           pos: this._randomPosition(),
           radius: Math.random() * 20 + 10,
         })
-      )
-    };
+      );
+    }
     return asteroids;
   }
 }
-
-
 
 export default Game;

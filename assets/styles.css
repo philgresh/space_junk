@@ -1,24 +1,51 @@
 body {
   background-color: #222;
-  margin: 0;
-  padding: 0;
-}
-
-body {
   background-image: url('./space.jpg');
   background-size: cover;
   margin: 0;
   padding: 0;
 }
 
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#mars {
+  position: relative;
+}
+
 #mars img {
-  width: 200px;
-  height: 200px;
-  position:absolute;
-  left: calc(50% - 100px);
-  top: calc(50% - 100px);
-  clip-path: circle(100px at center);
+  /*! position: absolute; */
   z-index: -1;
+}
+
+.station-parent {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 397px;
+  height: 397px;
+  /* border: 1px solid red; */
+  /*! border-radius: 50%; */
+}
+
+.station {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+  width: 100%;
+}
+
+.marker {
+  motion-path: path('M 5 5 m -4, 0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0');
+  offset-path: path('M 5 5 m -4, 0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0');
+  animation: move 20s linear infinite;
+  offset-rotate: auto;
 }
 
 .hidden {
@@ -35,5 +62,12 @@ body {
   }
   to {
     transform: rotate(-359deg);
+  }
+}
+
+@keyframes move {
+  100% {
+    motion-offset: 100%;
+    offset-distance: 100%;
   }
 }
