@@ -9,12 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const mars = new Mars(paperScope);
   const orbit1 = new Orbit({ paperScope, numJunks: 10, radius: 250 });
   const orbit2 = new Orbit({ paperScope, numJunks: 20, radius: 500, color: 'green' });
+  const orbit3 = new Orbit({ paperScope, numJunks: 30, radius: 750, color: 'orange' });
   console.log(paperScope);
 
   function onFrame(e) {
     // Orbit.draw();
     orbit1.onFrame(e);
     orbit2.onFrame(e);
+    orbit3.onFrame(e);
   }
   paperScope.view.onFrame = onFrame;
 });

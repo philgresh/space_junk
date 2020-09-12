@@ -6,18 +6,22 @@ import {
   genRandInt,
   genPosFromTheta,
   withinXangle,
-} from './util';
+} from './objs/utils/util';
+import {
+  checkCollisions,
+  breakUpCollision,
+} from './objs/utils/handleCollisions';
 
-const MIN_RECT_SIZE = 10;
-const MAX_RECT_SIZE = 40;
-const ORBIT_RADIUS_RANGE = 20;
+const MIN_RECT_SIZE = 20;
+const MAX_RECT_SIZE = 50;
+const ORBIT_RADIUS_RANGE = 50;
+const MARS_SURFACE_RADIUS = 125;
 
 const MAX_DELTA = 3;
 const STEPS = 10;
 const DELTA_ACCELERATE_FACTOR = 1 / 10;
 const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 30;
 const COLLISION_CHECK_ANGLE = (Math.PI * 2) / 18;
-const NEAREST_NEIGHBORS_TO_CHECK = 5;
 
 export default class Orbit {
   constructor(params) {
@@ -31,7 +35,11 @@ export default class Orbit {
     this.genJunks(this.numJunks);
     this.sortJunks();
     // this.drawOrbitCircle();
-    this.marsSurface = new Path.Circle(new Point(this.center), 125);
+    this.marsSurface = new Path.Circle(
+      new Point(this.center),
+      MARS_SURFACE_RADIUS
+    );
+    this.genJunk = this.genJunk.bind(this);
   }
 
   drawOrbitCircle() {
@@ -63,10 +71,13 @@ export default class Orbit {
     newRect.angle = angle;
     newRect.angleRate = angleRate;
     newRect.descentRate = descentRate;
+    newRect.size = size;
     newRect.rotate(angle);
     newRect.strokeColor = this.color;
     newRect.strokeWidth = 2;
-    newRect.fillColor = new Color(this.color, genRandNum(0.6, 1));
+    const alpha = genRandNum(0.4, 1);
+    newRect.fillColor = new Color(this.color);
+    newRect.fillColor.alpha = alpha;
 
     return newRect;
   }
@@ -82,7 +93,7 @@ export default class Orbit {
   updatePositions(delta) {
     const newJunks = [];
     this.junks.forEach((junk) => {
-      junk.theta -= delta;
+      junk.theta -= (delta * MARS_SURFACE_RADIUS) / junk.altitude;
       junk.altitude -= delta * junk.descentRate;
       const { x, y } = genPosFromTheta(this.center, junk.theta, junk.altitude);
       junk.position = new Point(x, y);
@@ -93,60 +104,6 @@ export default class Orbit {
       } else newJunks.push(junk);
     });
     this.junks = newJunks;
-  }
-
-  nearestNeighbors(index, num = NEAREST_NEIGHBORS_TO_CHECK) {
-    const neighbors = [];
-    for (let i = -num; i < num; i += 1) {
-      const j = (index + i) % this.junks.length;
-      if (j !== index && this.junks.slice(j, j + 1)[0])
-        neighbors.push(this.junks.slice(j, j + 1)[0]);
-    }
-    return neighbors;
-  }
-
-  checkCollisions() {
-    const collisions = [];
-    const pairs = {};
-    this.junks.forEach((junk, idx) => {
-      const neighbors = this.nearestNeighbors(idx);
-      neighbors.forEach((neigh) => {
-        if (junk.intersects(neigh) && !pairs[neigh]) {
-          collisions.push([junk, neigh]);
-          pairs[neigh] = junk;
-        }
-      });
-    });
-    return collisions;
-  }
-
-  breakUpCollision(a, b) {
-    const maxJunk = genJunk({
-      altitude: Math.max(a.altitude, b.altitude),
-      angleRate: a.angleRate + b.angleRate,
-      descentRate: Math.max(
-        Math.min(a.descentRate, b.descentRate) * 2,
-        DESCENT_RATE
-      ),
-      position: Point.max(a.position, b.position),
-      size: Size.max(a.size / 2, b.size / 2),
-      theta: Math.max(a.theta, b.theta),
-    });
-    const minJunk = genJunk({
-      altitude: Math.min(a.altitude, b.altitude),
-      angleRate: a.angleRate + b.angleRate,
-      descentRate: Math.min(
-        Math.max(a.descentRate, b.descentRate) * 2,
-        DESCENT_RATE
-      ),
-      position: Point.min(a.position, b.position),
-      size: Size.min(a.size / 2, b.size / 2),
-      theta: Math.min(a.theta, b.theta),
-    });
-    debugger;
-    a.remove();
-    b.remove();
-    return [maxJunk, minJunk];
   }
 
   rotateJunks() {
@@ -180,13 +137,14 @@ export default class Orbit {
       }
     } else {
       this.sortJunks();
-      const collisions = this.checkCollisions();
+      const collisions = checkCollisions(this.junks);
 
-      debugger;
       if (collisions.length) {
         collisions.forEach(([a, b]) => {
-          if (this.junks.includes(a) && this.junks.includes(b))
-            breakUpCollision(a, b);
+          if (this.junks.includes(a) && this.junks.includes(b)) {
+            const newJunks = breakUpCollision(a, b, this.genJunk, DESCENT_RATE);
+            this.junks.push(...newJunks);
+          }
         });
       }
     }

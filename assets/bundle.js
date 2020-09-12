@@ -33424,7 +33424,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Orbit; });
 /* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! paper */ "./node_modules/paper/dist/paper-full.js");
 /* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(paper__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util */ "./src/util.js");
+/* harmony import */ var _objs_utils_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./objs/utils/util */ "./src/objs/utils/util.js");
+/* harmony import */ var _objs_utils_handleCollisions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./objs/utils/handleCollisions */ "./src/objs/utils/handleCollisions.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -33445,15 +33454,16 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var MIN_RECT_SIZE = 10;
-var MAX_RECT_SIZE = 40;
-var ORBIT_RADIUS_RANGE = 20;
+
+var MIN_RECT_SIZE = 20;
+var MAX_RECT_SIZE = 50;
+var ORBIT_RADIUS_RANGE = 50;
+var MARS_SURFACE_RADIUS = 125;
 var MAX_DELTA = 3;
 var STEPS = 10;
 var DELTA_ACCELERATE_FACTOR = 1 / 10;
 var DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 30;
 var COLLISION_CHECK_ANGLE = Math.PI * 2 / 18;
-var NEAREST_NEIGHBORS_TO_CHECK = 5;
 
 var Orbit = /*#__PURE__*/function () {
   function Orbit(params) {
@@ -33468,7 +33478,8 @@ var Orbit = /*#__PURE__*/function () {
     this.genJunks(this.numJunks);
     this.sortJunks(); // this.drawOrbitCircle();
 
-    this.marsSurface = new paper__WEBPACK_IMPORTED_MODULE_0__["Path"].Circle(new paper__WEBPACK_IMPORTED_MODULE_0__["Point"](this.center), 125);
+    this.marsSurface = new paper__WEBPACK_IMPORTED_MODULE_0__["Path"].Circle(new paper__WEBPACK_IMPORTED_MODULE_0__["Point"](this.center), MARS_SURFACE_RADIUS);
+    this.genJunk = this.genJunk.bind(this);
   }
 
   _createClass(Orbit, [{
@@ -33481,19 +33492,19 @@ var Orbit = /*#__PURE__*/function () {
     key: "genJunk",
     value: function genJunk(params) {
       var _params$altitude = params.altitude,
-          altitude = _params$altitude === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(this.radius - ORBIT_RADIUS_RANGE / 2, this.radius + ORBIT_RADIUS_RANGE / 2) : _params$altitude,
+          altitude = _params$altitude === void 0 ? Object(_objs_utils_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(this.radius - ORBIT_RADIUS_RANGE / 2, this.radius + ORBIT_RADIUS_RANGE / 2) : _params$altitude,
           _params$angle = params.angle,
-          angle = _params$angle === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandInt"])(0, 360) : _params$angle,
+          angle = _params$angle === void 0 ? Object(_objs_utils_util__WEBPACK_IMPORTED_MODULE_1__["genRandInt"])(0, 360) : _params$angle,
           _params$angleRate = params.angleRate,
-          angleRate = _params$angleRate === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(-1, 0.5) / 2 : _params$angleRate,
+          angleRate = _params$angleRate === void 0 ? Object(_objs_utils_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(-1, 0.5) / 2 : _params$angleRate,
           _params$descentRate = params.descentRate,
           descentRate = _params$descentRate === void 0 ? DESCENT_RATE : _params$descentRate,
           _params$theta = params.theta,
-          theta = _params$theta === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandAngle"])() : _params$theta,
+          theta = _params$theta === void 0 ? Object(_objs_utils_util__WEBPACK_IMPORTED_MODULE_1__["genRandAngle"])() : _params$theta,
           _params$position = params.position,
-          position = _params$position === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genPosFromTheta"])(this.center, theta, altitude) : _params$position,
+          position = _params$position === void 0 ? Object(_objs_utils_util__WEBPACK_IMPORTED_MODULE_1__["genPosFromTheta"])(this.center, theta, altitude) : _params$position,
           _params$size = params.size,
-          size = _params$size === void 0 ? new paper__WEBPACK_IMPORTED_MODULE_0__["Size"](Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(MIN_RECT_SIZE, MAX_RECT_SIZE), Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(MIN_RECT_SIZE, MAX_RECT_SIZE)) : _params$size;
+          size = _params$size === void 0 ? new paper__WEBPACK_IMPORTED_MODULE_0__["Size"](Object(_objs_utils_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(MIN_RECT_SIZE, MAX_RECT_SIZE), Object(_objs_utils_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(MIN_RECT_SIZE, MAX_RECT_SIZE)) : _params$size;
       var newRect = new paper__WEBPACK_IMPORTED_MODULE_0__["Path"].Rectangle(position, size);
       newRect.position = position;
       newRect.theta = theta;
@@ -33501,10 +33512,13 @@ var Orbit = /*#__PURE__*/function () {
       newRect.angle = angle;
       newRect.angleRate = angleRate;
       newRect.descentRate = descentRate;
+      newRect.size = size;
       newRect.rotate(angle);
       newRect.strokeColor = this.color;
       newRect.strokeWidth = 2;
-      newRect.fillColor = new paper__WEBPACK_IMPORTED_MODULE_0__["Color"](this.color, Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(0.6, 1));
+      var alpha = Object(_objs_utils_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(0.4, 1);
+      newRect.fillColor = new paper__WEBPACK_IMPORTED_MODULE_0__["Color"](this.color);
+      newRect.fillColor.alpha = alpha;
       return newRect;
     }
   }, {
@@ -33526,10 +33540,10 @@ var Orbit = /*#__PURE__*/function () {
 
       var newJunks = [];
       this.junks.forEach(function (junk) {
-        junk.theta -= delta;
+        junk.theta -= delta * MARS_SURFACE_RADIUS / junk.altitude;
         junk.altitude -= delta * junk.descentRate;
 
-        var _genPosFromTheta = Object(_util__WEBPACK_IMPORTED_MODULE_1__["genPosFromTheta"])(_this.center, junk.theta, junk.altitude),
+        var _genPosFromTheta = Object(_objs_utils_util__WEBPACK_IMPORTED_MODULE_1__["genPosFromTheta"])(_this.center, junk.theta, junk.altitude),
             x = _genPosFromTheta.x,
             y = _genPosFromTheta.y;
 
@@ -33540,62 +33554,6 @@ var Orbit = /*#__PURE__*/function () {
         } else newJunks.push(junk);
       });
       this.junks = newJunks;
-    }
-  }, {
-    key: "nearestNeighbors",
-    value: function nearestNeighbors(index) {
-      var num = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : NEAREST_NEIGHBORS_TO_CHECK;
-      var neighbors = [];
-
-      for (var i = -num; i < num; i += 1) {
-        var j = (index + i) % this.junks.length;
-        if (j !== index && this.junks.slice(j, j + 1)[0]) neighbors.push(this.junks.slice(j, j + 1)[0]);
-      }
-
-      return neighbors;
-    }
-  }, {
-    key: "checkCollisions",
-    value: function checkCollisions() {
-      var _this2 = this;
-
-      var collisions = [];
-      var pairs = {};
-      this.junks.forEach(function (junk, idx) {
-        var neighbors = _this2.nearestNeighbors(idx);
-
-        neighbors.forEach(function (neigh) {
-          if (junk.intersects(neigh) && !pairs[neigh]) {
-            collisions.push([junk, neigh]);
-            pairs[neigh] = junk;
-          }
-        });
-      });
-      return collisions;
-    }
-  }, {
-    key: "breakUpCollision",
-    value: function breakUpCollision(a, b) {
-      var maxJunk = genJunk({
-        altitude: Math.max(a.altitude, b.altitude),
-        angleRate: a.angleRate + b.angleRate,
-        descentRate: Math.max(Math.min(a.descentRate, b.descentRate) * 2, DESCENT_RATE),
-        position: paper__WEBPACK_IMPORTED_MODULE_0__["Point"].max(a.position, b.position),
-        size: paper__WEBPACK_IMPORTED_MODULE_0__["Size"].max(a.size / 2, b.size / 2),
-        theta: Math.max(a.theta, b.theta)
-      });
-      var minJunk = genJunk({
-        altitude: Math.min(a.altitude, b.altitude),
-        angleRate: a.angleRate + b.angleRate,
-        descentRate: Math.min(Math.max(a.descentRate, b.descentRate) * 2, DESCENT_RATE),
-        position: paper__WEBPACK_IMPORTED_MODULE_0__["Point"].min(a.position, b.position),
-        size: paper__WEBPACK_IMPORTED_MODULE_0__["Size"].min(a.size / 2, b.size / 2),
-        theta: Math.min(a.theta, b.theta)
-      });
-      debugger;
-      a.remove();
-      b.remove();
-      return [maxJunk, minJunk];
     }
   }, {
     key: "rotateJunks",
@@ -33623,7 +33581,7 @@ var Orbit = /*#__PURE__*/function () {
   }, {
     key: "onFrame",
     value: function onFrame(event) {
-      var _this3 = this;
+      var _this2 = this;
 
       // console.log(event);
       var delta = event.delta;
@@ -33638,8 +33596,7 @@ var Orbit = /*#__PURE__*/function () {
         }
       } else {
         this.sortJunks();
-        var collisions = this.checkCollisions();
-        debugger;
+        var collisions = Object(_objs_utils_handleCollisions__WEBPACK_IMPORTED_MODULE_2__["checkCollisions"])(this.junks);
 
         if (collisions.length) {
           collisions.forEach(function (_ref) {
@@ -33647,7 +33604,13 @@ var Orbit = /*#__PURE__*/function () {
                 a = _ref2[0],
                 b = _ref2[1];
 
-            if (_this3.junks.includes(a) && _this3.junks.includes(b)) breakUpCollision(a, b);
+            if (_this2.junks.includes(a) && _this2.junks.includes(b)) {
+              var _this2$junks;
+
+              var newJunks = Object(_objs_utils_handleCollisions__WEBPACK_IMPORTED_MODULE_2__["breakUpCollision"])(a, b, _this2.genJunk, DESCENT_RATE);
+
+              (_this2$junks = _this2.junks).push.apply(_this2$junks, _toConsumableArray(newJunks));
+            }
           });
         }
       }
@@ -33692,12 +33655,19 @@ document.addEventListener('DOMContentLoaded', function () {
     radius: 500,
     color: 'green'
   });
+  var orbit3 = new _Orbit__WEBPACK_IMPORTED_MODULE_2__["default"]({
+    paperScope: paperScope,
+    numJunks: 30,
+    radius: 750,
+    color: 'orange'
+  });
   console.log(paperScope);
 
   function onFrame(e) {
     // Orbit.draw();
     orbit1.onFrame(e);
     orbit2.onFrame(e);
+    orbit3.onFrame(e);
   }
 
   paperScope.view.onFrame = onFrame;
@@ -33785,10 +33755,86 @@ var Mars = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./src/util.js":
-/*!*********************!*\
-  !*** ./src/util.js ***!
-  \*********************/
+/***/ "./src/objs/utils/handleCollisions.js":
+/*!********************************************!*\
+  !*** ./src/objs/utils/handleCollisions.js ***!
+  \********************************************/
+/*! exports provided: checkCollisions, breakUpCollision */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkCollisions", function() { return checkCollisions; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "breakUpCollision", function() { return breakUpCollision; });
+/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! paper */ "./node_modules/paper/dist/paper-full.js");
+/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(paper__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util */ "./src/objs/utils/util.js");
+
+
+var NEAREST_NEIGHBORS_TO_CHECK = 5;
+
+var nearestNeighbors = function nearestNeighbors(junks, index) {
+  var num = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : NEAREST_NEIGHBORS_TO_CHECK;
+  var neighbors = [];
+
+  for (var i = -num; i < num; i += 1) {
+    var j = (index + i) % junks.length;
+    if (j !== index && junks.slice(j, j + 1)[0]) neighbors.push(junks.slice(j, j + 1)[0]);
+  }
+
+  return neighbors;
+};
+
+var checkCollisions = function checkCollisions(junks) {
+  var collisions = [];
+  var pairs = {};
+  junks.forEach(function (junk, idx) {
+    var neighbors = nearestNeighbors(junks, idx);
+    neighbors.forEach(function (neigh) {
+      if (junk.intersects(neigh) && !pairs[neigh]) {
+        collisions.push([junk, neigh]);
+        pairs[neigh] = junk;
+      }
+    });
+  });
+  return collisions;
+};
+var breakUpCollision = function breakUpCollision(a, b, genJunk, DESCENT_RATE) {
+  var altitude = Math.max(a.altitude, b.altitude);
+  var angleRate = a.angleRate + b.angleRate;
+  var descentRate = Math.max(Math.min(a.descentRate, b.descentRate) * 2, DESCENT_RATE);
+  var size = paper__WEBPACK_IMPORTED_MODULE_0__["Size"].max(a.size.divide(2), b.size.divide(2));
+  var theta = Math.max(a.theta, b.theta) + Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(-1, 1);
+  var maxJunk = genJunk({
+    altitude: altitude,
+    angleRate: angleRate,
+    descentRate: descentRate,
+    size: size,
+    theta: theta
+  });
+  altitude = Math.min(a.altitude, b.altitude);
+  angleRate = a.angleRate + b.angleRate;
+  descentRate = Math.min(Math.max(a.descentRate, b.descentRate) / 2, DESCENT_RATE);
+  size = paper__WEBPACK_IMPORTED_MODULE_0__["Size"].min(a.size.divide(2), b.size.divide(2));
+  theta = Math.min(a.theta, b.theta) + Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(-1, 1);
+  var minJunk = genJunk({
+    altitude: altitude,
+    angleRate: angleRate,
+    descentRate: descentRate,
+    size: size,
+    theta: theta
+  });
+  a.remove();
+  b.remove();
+  return [maxJunk, minJunk];
+};
+
+/***/ }),
+
+/***/ "./src/objs/utils/util.js":
+/*!********************************!*\
+  !*** ./src/objs/utils/util.js ***!
+  \********************************/
 /*! exports provided: randomVec, scale, straightLineDistance, genID, getOffset, genRandAngle, genRandInt, genRandNum, genPosFromTheta, withinXangle */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
