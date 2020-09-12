@@ -1,11 +1,16 @@
 {
-  "name": "asteroids",
+  "name": "space-junk",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack": "webpack --watch --mode=development"
+    "webpack": "webpack src/index.js -o dist/bundle.js --watch --mode=development",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -b gh-pages -d dist",
+    "build": "webpack --config=webpack.config.prod.js",
+    "build-dev": "webpack --config=webpack.config.dev.js",
+    "start": "webpack-dev-server --config=webpack.config.dev.js --color"
   },
   "keywords": [],
   "author": "",
@@ -19,8 +24,11 @@
   },
   "devDependencies": {
     "@types/jquery": "^3.5.1",
+    "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^4.3.0",
     "file-loader": "^6.1.0",
+    "gh-pages": "^3.1.0",
+    "html-webpack-plugin": "^4.4.1",
     "image-webpack-loader": "^7.0.0",
     "mini-css-extract-plugin": "^0.11.1",
     "node-sass": "^4.14.1",
@@ -29,6 +37,7 @@
     "sass-loader": "^10.0.2",
     "style-loader": "^1.2.1",
     "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   }
 }

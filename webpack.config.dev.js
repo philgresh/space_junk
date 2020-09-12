@@ -1,14 +1,22 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 module.exports = {
-  context: __dirname,
+  mode: 'development',
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    port: 3000,
+  },
   entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, 'assets'),
     filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist')
   },
   module: {
     rules: [
@@ -90,8 +98,13 @@ module.exports = {
       filename: isDevelopment ? '[name].css' : '[name].[hash].css',
       chunkFilename: isDevelopment ? '[id].css' : '[id].[hash].css',
     }),
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      inject: true,
+      template: path.resolve(__dirname, 'src', 'index.html'),
+    }),
   ],
-  devtool: 'source-map',
   resolve: {
     extensions: [
       '.js',
