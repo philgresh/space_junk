@@ -1,6 +1,6 @@
 body {
   background-color: #222;
-  background-image: url('space.jpg');
+  background-image: url('../images/space.jpg');
   background-size: cover;
   margin: 0;
   padding: 0;
@@ -30,6 +30,20 @@ canvas {
   position: relative;
 }
 
+#mars > img {
+  background-image: '../images/mars_pole.jpg';
+  z-index: -1;
+  height: 300px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  clip-path: circle(125px at center center);
+  transform: translate(-50%, -50%);
+  width: 300px;
+  margin-top: -150px;
+  margin-left: -150px;
+}
+
 .overlay {
   position: absolute;
   top: 0;
@@ -57,19 +71,6 @@ canvas {
     rgba(0, 0, 0, 0.85) 55%
   );
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#000000",endColorstr="#000000",GradientType=1);
-}
-
-#mars img {
-  z-index: -1;
-  height: 300px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  clip-path: circle(125px at center center);
-  transform: translate(-50%, -50%);
-  width: 300px;
-  margin-top: -150px;
-  margin-left: -150px;
 }
 
 .station-parent {
