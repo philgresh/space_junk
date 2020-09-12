@@ -1,24 +1,22 @@
-// console.log('webpack is working!')
-const GameView = require('./game_view');
-const Mars = require('./mars');
+import paper, { Path, Point } from 'paper';
+import Mars from './mars';
+import Orbit from './Orbit';
 
-$(function () {
-  const $gameCanvas = $('#game-canvas')[0];
-  const $marsCanvas = $('#mars canvas')[0];
-  const gameCtx = $gameCanvas.getContext('2d');
-  const marsCtx = $marsCanvas.getContext('2d');
+document.addEventListener('DOMContentLoaded', () => {
+  const marsCanvas = document.getElementById('game-canvas');
+  const paperScope = paper.setup(marsCanvas);
 
-  resizeCanvases([$marsCanvas, $gameCanvas]);
+  const mars = new Mars(paperScope);
+  const orbit1 = new Orbit({ paperScope, numJunks: 10, radius: 250 });
+  const orbit2 = new Orbit({ paperScope, numJunks: 20, radius: 500, color: 'green' });
+  const orbit3 = new Orbit({ paperScope, numJunks: 30, radius: 750, color: 'orange' });
+  console.log(paperScope);
 
-  const mars = new Mars(marsCtx, $marsCanvas.width, $marsCanvas.height);
-  // const gameView = new GameView(gameCtx, canvas.width, canvas.height);
-  // gameView.start();
-  // $canvas.removeClass('hidden');
-})
-
-function resizeCanvases(canvases) {
-  canvases.forEach((canvas) => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  })
-}
+  function onFrame(e) {
+    // Orbit.draw();
+    orbit1.onFrame(e);
+    orbit2.onFrame(e);
+    orbit3.onFrame(e);
+  }
+  paperScope.view.onFrame = onFrame;
+});
