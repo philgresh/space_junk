@@ -33412,17 +33412,19 @@ return paper;
 
 /***/ }),
 
-/***/ "./src/game.js":
-/*!*********************!*\
-  !*** ./src/game.js ***!
-  \*********************/
+/***/ "./src/Orbit.js":
+/*!**********************!*\
+  !*** ./src/Orbit.js ***!
+  \**********************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _objs_asteroid__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./objs/asteroid */ "./src/objs/asteroid.js");
-/* harmony import */ var _objs_ship__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./objs/ship */ "./src/objs/ship.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Orbit; });
+/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! paper */ "./node_modules/paper/dist/paper-full.js");
+/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(paper__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util */ "./src/util.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -33443,202 +33445,219 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+var MIN_RECT_SIZE = 10;
+var MAX_RECT_SIZE = 40;
+var ORBIT_RADIUS_RANGE = 20;
+var MAX_DELTA = 3;
+var STEPS = 10;
+var DELTA_ACCELERATE_FACTOR = 1 / 10;
+var DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 30;
+var COLLISION_CHECK_ANGLE = Math.PI * 2 / 18;
+var NEAREST_NEIGHBORS_TO_CHECK = 5;
 
-var Game = /*#__PURE__*/function () {
-  function Game(width, height) {
-    var numAsteroids = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 20;
+var Orbit = /*#__PURE__*/function () {
+  function Orbit(params) {
+    _classCallCheck(this, Orbit);
 
-    _classCallCheck(this, Game);
+    this.numJunks = params.numJunks;
+    this.paperScope = params.paperScope;
+    this.center = this.paperScope.view.center;
+    this.radius = params.radius;
+    this.junks = [];
+    this.color = params.color || 'red';
+    this.genJunks(this.numJunks);
+    this.sortJunks(); // this.drawOrbitCircle();
 
-    this.allObjects = [];
-    this.ship;
-    this.DIM_X = width;
-    this.DIM_Y = height;
-    this.NUM_ASTEROIDS = numAsteroids;
-    this.addAllObjects();
+    this.marsSurface = new paper__WEBPACK_IMPORTED_MODULE_0__["Path"].Circle(new paper__WEBPACK_IMPORTED_MODULE_0__["Point"](this.center), 125);
   }
 
-  _createClass(Game, [{
-    key: "step",
-    value: function step(ctx) {
-      // debugger
-      ctx.clearRect(0, 0, this.DIM_X, this.DIM_Y);
-      var i = 0;
+  _createClass(Orbit, [{
+    key: "drawOrbitCircle",
+    value: function drawOrbitCircle() {
+      var orbit1 = new paper__WEBPACK_IMPORTED_MODULE_0__["Path"].Circle(new paper__WEBPACK_IMPORTED_MODULE_0__["Point"](this.center), this.radius);
+      orbit1.strokeColor = this.color;
+    }
+  }, {
+    key: "genJunk",
+    value: function genJunk(params) {
+      var _params$altitude = params.altitude,
+          altitude = _params$altitude === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(this.radius - ORBIT_RADIUS_RANGE / 2, this.radius + ORBIT_RADIUS_RANGE / 2) : _params$altitude,
+          _params$angle = params.angle,
+          angle = _params$angle === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandInt"])(0, 360) : _params$angle,
+          _params$angleRate = params.angleRate,
+          angleRate = _params$angleRate === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(-1, 0.5) / 2 : _params$angleRate,
+          _params$descentRate = params.descentRate,
+          descentRate = _params$descentRate === void 0 ? DESCENT_RATE : _params$descentRate,
+          _params$theta = params.theta,
+          theta = _params$theta === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandAngle"])() : _params$theta,
+          _params$position = params.position,
+          position = _params$position === void 0 ? Object(_util__WEBPACK_IMPORTED_MODULE_1__["genPosFromTheta"])(this.center, theta, altitude) : _params$position,
+          _params$size = params.size,
+          size = _params$size === void 0 ? new paper__WEBPACK_IMPORTED_MODULE_0__["Size"](Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(MIN_RECT_SIZE, MAX_RECT_SIZE), Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(MIN_RECT_SIZE, MAX_RECT_SIZE)) : _params$size;
+      var newRect = new paper__WEBPACK_IMPORTED_MODULE_0__["Path"].Rectangle(position, size);
+      newRect.position = position;
+      newRect.theta = theta;
+      newRect.altitude = altitude;
+      newRect.angle = angle;
+      newRect.angleRate = angleRate;
+      newRect.descentRate = descentRate;
+      newRect.rotate(angle);
+      newRect.strokeColor = this.color;
+      newRect.strokeWidth = 2;
+      newRect.fillColor = new paper__WEBPACK_IMPORTED_MODULE_0__["Color"](this.color, Object(_util__WEBPACK_IMPORTED_MODULE_1__["genRandNum"])(0.6, 1));
+      return newRect;
+    }
+  }, {
+    key: "genJunks",
+    value: function genJunks() {
+      var numJunks = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.numJunks;
 
-      while (i < this.allObjects.length) {
-        var obj = this.allObjects[i]; // move all
-
-        obj.move(); // remove any off-screen
-
-        if (this._isCompletelyOffScreen(obj)) {
-          this.remove(i); // console.log('object removed', this);
-        } else {
-          // create clones for almost-off-screen
-          // check for collisions
-          // this.checkCollisionsOnObj(obj)
-          // draw all
-          obj.draw(ctx);
-          i++;
-        }
+      for (var i = 0; i < numJunks; i += 1) {
+        var newRect = this.genJunk({});
+        this.junks.push(newRect);
       }
+
+      console.log(this.junks);
     }
   }, {
-    key: "cloneSideObjs",
-    value: function cloneSideObjs(obj) {
-      var _obj$pos = _slicedToArray(obj.pos, 2),
-          x = _obj$pos[0],
-          y = _obj$pos[1];
+    key: "updatePositions",
+    value: function updatePositions(delta) {
+      var _this = this;
 
-      var radius = obj.radius; // (x + radius > this.DIM_X) ||
-      //   (x - radius < 0) ||
-      //   (y + radius > this.DIM_Y) ||
-      //   (y - radius < 0)
+      var newJunks = [];
+      this.junks.forEach(function (junk) {
+        junk.theta -= delta;
+        junk.altitude -= delta * junk.descentRate;
 
-      if (x + radius > this.DIM_X) {
-        // Moving off to the right
-        var pos = 0 - this.DIM_X;
-        console.log(pos); // if (this.allObjects.includes())
-        // this.cloneObj({
-        //   ...obj
-        // })
+        var _genPosFromTheta = Object(_util__WEBPACK_IMPORTED_MODULE_1__["genPosFromTheta"])(_this.center, junk.theta, junk.altitude),
+            x = _genPosFromTheta.x,
+            y = _genPosFromTheta.y;
+
+        junk.position = new paper__WEBPACK_IMPORTED_MODULE_0__["Point"](x, y);
+
+        if (junk.intersects(_this.marsSurface)) {
+          junk.remove(); // subtract points
+        } else newJunks.push(junk);
+      });
+      this.junks = newJunks;
+    }
+  }, {
+    key: "nearestNeighbors",
+    value: function nearestNeighbors(index) {
+      var num = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : NEAREST_NEIGHBORS_TO_CHECK;
+      var neighbors = [];
+
+      for (var i = -num; i < num; i += 1) {
+        var j = (index + i) % this.junks.length;
+        if (j !== index && this.junks.slice(j, j + 1)[0]) neighbors.push(this.junks.slice(j, j + 1)[0]);
       }
-    }
-  }, {
-    key: "checkCollisionsOnObj",
-    value: function checkCollisionsOnObj(obj) {
-      var allObjs = this.allObjects;
 
-      for (var i = 0; i < allObjs.length - 1; i++) {
-        var otherObj = allObjs[j];
+      return neighbors;
+    }
+  }, {
+    key: "checkCollisions",
+    value: function checkCollisions() {
+      var _this2 = this;
 
-        if (obj.isCollidedWith(otherObj)) {
-          this.remove(obj);
-          this.remove(otherObj);
-          break;
-        }
-      }
-    }
-  }, {
-    key: "remove",
-    value: function remove(idx) {
-      this.allObjects.splice(idx, 1);
-    }
-  }, {
-    key: "addAllObjects",
-    value: function addAllObjects() {
-      // this.ship = new Ship({
-      //   game: this,
-      //   pos: this._randomPosition(),
-      // });
-      var backgroundAsteroids = this._genAsteroids(this.NUM_ASTEROIDS / 2, -1);
+      var collisions = [];
+      var pairs = {};
+      this.junks.forEach(function (junk, idx) {
+        var neighbors = _this2.nearestNeighbors(idx);
 
-      var foregroundAsteroids = this._genAsteroids(this.NUM_ASTEROIDS / 2, 0);
-
-      this.allObjects = backgroundAsteroids.concat(foregroundAsteroids);
+        neighbors.forEach(function (neigh) {
+          if (junk.intersects(neigh) && !pairs[neigh]) {
+            collisions.push([junk, neigh]);
+            pairs[neigh] = junk;
+          }
+        });
+      });
+      return collisions;
     }
   }, {
-    key: "cloneObj",
-    value: function cloneObj(obj) {
-      if (obj.z === 0) {// add to main field
-      } else {// add to background
-        }
+    key: "breakUpCollision",
+    value: function breakUpCollision(a, b) {
+      var maxJunk = genJunk({
+        altitude: Math.max(a.altitude, b.altitude),
+        angleRate: a.angleRate + b.angleRate,
+        descentRate: Math.max(Math.min(a.descentRate, b.descentRate) * 2, DESCENT_RATE),
+        position: paper__WEBPACK_IMPORTED_MODULE_0__["Point"].max(a.position, b.position),
+        size: paper__WEBPACK_IMPORTED_MODULE_0__["Size"].max(a.size / 2, b.size / 2),
+        theta: Math.max(a.theta, b.theta)
+      });
+      var minJunk = genJunk({
+        altitude: Math.min(a.altitude, b.altitude),
+        angleRate: a.angleRate + b.angleRate,
+        descentRate: Math.min(Math.max(a.descentRate, b.descentRate) * 2, DESCENT_RATE),
+        position: paper__WEBPACK_IMPORTED_MODULE_0__["Point"].min(a.position, b.position),
+        size: paper__WEBPACK_IMPORTED_MODULE_0__["Size"].min(a.size / 2, b.size / 2),
+        theta: Math.min(a.theta, b.theta)
+      });
+      debugger;
+      a.remove();
+      b.remove();
+      return [maxJunk, minJunk];
     }
   }, {
-    key: "_randomPosition",
-    value: function _randomPosition() {
-      var randX = Math.random() * this.DIM_X;
-      var randY = Math.random() * this.DIM_Y;
-      return [randX, randY];
-    }
-  }, {
-    key: "_isPartiallyOffScreen",
-    value: function _isPartiallyOffScreen(_ref) {
-      var pos = _ref.pos,
-          radius = _ref.radius;
-      return this._isCompletelyOffScreen({
-        pos: pos,
-        radius: 0
-      }) && !this._isCompletelyOffScreen({
-        pos: pos,
-        radius: radius
+    key: "rotateJunks",
+    value: function rotateJunks() {
+      this.junks.forEach(function (junk) {
+        var newAngle = (junk.angle + junk.angleRate) % 360;
+        junk.angle = newAngle;
+        junk.rotate(junk.angleRate);
       });
     }
   }, {
-    key: "_isCompletelyOffScreen",
-    value: function _isCompletelyOffScreen(_ref2) {
-      var _ref2$pos = _slicedToArray(_ref2.pos, 2),
-          x = _ref2$pos[0],
-          y = _ref2$pos[1],
-          radius = _ref2.radius;
-
-      return x - radius > this.DIM_X || x + radius < 0 || y - radius > this.DIM_Y || y + radius < 0;
+    key: "simulate",
+    value: function simulate(delta) {
+      this.radius -= delta;
+      this.updatePositions(delta);
+      this.rotateJunks(delta);
     }
   }, {
-    key: "_genAsteroids",
-    value: function _genAsteroids(num) {
-      var z = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-      var asteroids = [];
+    key: "sortJunks",
+    value: function sortJunks() {
+      this.junks = this.junks.sort(function (a, b) {
+        return a.angle - b.angle;
+      });
+    }
+  }, {
+    key: "onFrame",
+    value: function onFrame(event) {
+      var _this3 = this;
 
-      for (var i = 0; i < num; i++) {
-        asteroids.push(new _objs_asteroid__WEBPACK_IMPORTED_MODULE_0__["default"]({
-          z: z,
-          game: this,
-          pos: this._randomPosition(),
-          radius: Math.random() * 20 + 10
-        }));
+      // console.log(event);
+      var delta = event.delta;
+
+      if (event.count % 200 !== 0) {
+        if (delta > MAX_DELTA) delta = MAX_DELTA;
+        delta *= DELTA_ACCELERATE_FACTOR;
+
+        for (var i = 0; i < STEPS; i += 1) {
+          // this.simulate(delta / STEPS);
+          this.simulate(delta);
+        }
+      } else {
+        this.sortJunks();
+        var collisions = this.checkCollisions();
+        debugger;
+
+        if (collisions.length) {
+          collisions.forEach(function (_ref) {
+            var _ref2 = _slicedToArray(_ref, 2),
+                a = _ref2[0],
+                b = _ref2[1];
+
+            if (_this3.junks.includes(a) && _this3.junks.includes(b)) breakUpCollision(a, b);
+          });
+        }
       }
-
-      return asteroids;
     }
   }]);
 
-  return Game;
+  return Orbit;
 }();
 
-/* harmony default export */ __webpack_exports__["default"] = (Game);
 
-/***/ }),
-
-/***/ "./src/game_view.js":
-/*!**************************!*\
-  !*** ./src/game_view.js ***!
-  \**************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var Game = __webpack_require__(/*! ./game */ "./src/game.js")["default"];
-
-var GameView = /*#__PURE__*/function () {
-  function GameView(ctx, width, height) {
-    _classCallCheck(this, GameView);
-
-    this.ctx = ctx;
-    this.game = new Game(width, height, 200);
-  }
-
-  _createClass(GameView, [{
-    key: "start",
-    value: function start() {
-      var _this = this;
-
-      setInterval(function () {
-        window.requestAnimationFrame(function () {
-          return _this.game.step(_this.ctx);
-        });
-      }, 200);
-    }
-  }]);
-
-  return GameView;
-}();
-
-module.exports = GameView;
 
 /***/ }),
 
@@ -33651,23 +33670,37 @@ module.exports = GameView;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! paper */ "./node_modules/paper/dist/paper-full.js");
-/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(paper__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _game_view__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./game_view */ "./src/game_view.js");
-/* harmony import */ var _game_view__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_game_view__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _mars__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./mars */ "./src/mars.js");
-
+/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! paper */ "./node_modules/paper/dist/paper-full.js");
+/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(paper__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _mars__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mars */ "./src/mars.js");
+/* harmony import */ var _Orbit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Orbit */ "./src/Orbit.js");
 
 
 
 document.addEventListener('DOMContentLoaded', function () {
   var marsCanvas = document.getElementById('game-canvas');
-  var paperScope = paper__WEBPACK_IMPORTED_MODULE_1___default.a.setup(marsCanvas);
-  var paperView = paperScope.view;
+  var paperScope = paper__WEBPACK_IMPORTED_MODULE_0___default.a.setup(marsCanvas);
+  var mars = new _mars__WEBPACK_IMPORTED_MODULE_1__["default"](paperScope);
+  var orbit1 = new _Orbit__WEBPACK_IMPORTED_MODULE_2__["default"]({
+    paperScope: paperScope,
+    numJunks: 10,
+    radius: 250
+  });
+  var orbit2 = new _Orbit__WEBPACK_IMPORTED_MODULE_2__["default"]({
+    paperScope: paperScope,
+    numJunks: 20,
+    radius: 500,
+    color: 'green'
+  });
   console.log(paperScope);
-  var mars = new _mars__WEBPACK_IMPORTED_MODULE_3__["default"](paperScope);
+
+  function onFrame(e) {
+    // Orbit.draw();
+    orbit1.onFrame(e);
+    orbit2.onFrame(e);
+  }
+
+  paperScope.view.onFrame = onFrame;
 });
 
 /***/ }),
@@ -33707,7 +33740,6 @@ var Mars = /*#__PURE__*/function () {
     this.CENTER_Y = this.height / 2;
     this.MARS_RADIUS = this.width * MARS_SIZE;
     this.ATMOSPHERE_RADIUS = this.MARS_RADIUS * 1.4;
-    this.resizeMars(canvas);
     this.renderBackgroundGradient();
     this.renderForegroundGradients();
     window.addEventListener('resize', this.resizeCanvas);
@@ -33743,51 +33775,6 @@ var Mars = /*#__PURE__*/function () {
       this.ctx.arc(this.CENTER_X, this.CENTER_Y, this.MARS_RADIUS, 0, 2 * Math.PI);
       this.ctx.fill();
       this.ctx.closePath();
-    } // renderShadow() {
-    //   // debugger;
-    //   // Draw foreground Mars with reflection/shadow
-    //   let gradient = this.ctx.createRadialGradient(
-    //     this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.85,
-    //     this.CENTER_Y,
-    //     0.1,
-    //     this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.5,
-    //     this.CENTER_Y,
-    //     this.ATMOSPHERE_RADIUS
-    //   );
-    //   gradient.addColorStop(0, '#10101044');
-    //   gradient.addColorStop(0.7, '#10101099');
-    //   gradient.addColorStop(1, '#10101000');
-    //   this.ctx.beginPath();
-    //   this.ctx.fillStyle = gradient;
-    //   this.ctx.arc(
-    //     this.CENTER_X,
-    //     this.CENTER_Y,
-    //     this.ATMOSPHERE_RADIUS,
-    //     0,
-    //     2 * Math.PI
-    //   );
-    //   this.ctx.fill();
-    //   this.ctx.closePath();
-    // }
-
-  }, {
-    key: "resizeCanvas",
-    value: function resizeCanvas(canvas) {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-  }, {
-    key: "resizeMars",
-    value: function resizeMars() {
-      var $marsImg = jquery__WEBPACK_IMPORTED_MODULE_0___default()('#mars img');
-      $marsImg.height(this.MARS_RADIUS * 2);
-      $marsImg.offset({
-        top: this.CENTER_Y - this.MARS_RADIUS,
-        left: this.CENTER_X - this.MARS_RADIUS
-      });
-      $marsImg.css('clip-path', "circle(".concat(this.MARS_RADIUS, "px at center)"));
     }
   }]);
 
@@ -33798,246 +33785,11 @@ var Mars = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ "./src/objs/asteroid.js":
-/*!******************************!*\
-  !*** ./src/objs/asteroid.js ***!
-  \******************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util */ "./src/util.js");
-/* harmony import */ var _movingObject_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./movingObject.js */ "./src/objs/movingObject.js");
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-
-
-var COLOR = '#333';
-var RADIUS = 20;
-
-var Asteroid = /*#__PURE__*/function (_MovingObject) {
-  _inherits(Asteroid, _MovingObject);
-
-  var _super = _createSuper(Asteroid);
-
-  function Asteroid(obj) {
-    _classCallCheck(this, Asteroid);
-
-    return _super.call(this, {
-      game: obj.game,
-      pos: obj.pos,
-      color: obj.color || COLOR,
-      radius: obj.radius || RADIUS,
-      vel: Object(_util__WEBPACK_IMPORTED_MODULE_0__["randomVec"])(3),
-      z: obj.z || Math.floor(Math.random() * -2 + 1)
-    });
-  }
-
-  return Asteroid;
-}(_movingObject_js__WEBPACK_IMPORTED_MODULE_1__["default"]);
-
-/* harmony default export */ __webpack_exports__["default"] = (Asteroid);
-
-/***/ }),
-
-/***/ "./src/objs/movingObject.js":
-/*!**********************************!*\
-  !*** ./src/objs/movingObject.js ***!
-  \**********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util */ "./src/util.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-
-
-function createGradient(ctx, pos, radius, z) {
-  var _pos = _slicedToArray(pos, 2),
-      x = _pos[0],
-      y = _pos[1];
-
-  var gradient = ctx.createRadialGradient(x - radius * .65, y, .1, x - radius * .65, y, radius);
-
-  if (z < 0) {
-    gradient.addColorStop(0, "#555");
-  } else {
-    gradient.addColorStop(0, "#7f9eba");
-  }
-
-  gradient.addColorStop(1, "#111");
-  return gradient;
-}
-
-;
-
-var MovingObject = /*#__PURE__*/function () {
-  function MovingObject(obj) {
-    _classCallCheck(this, MovingObject);
-
-    this.id = Object(_util__WEBPACK_IMPORTED_MODULE_0__["genID"])();
-    this.game = obj.game;
-    this.pos = obj.pos; // [100, 150]
-
-    this.vel = obj.vel; // [10, 10]
-
-    this.radius = obj.radius;
-    this.color = obj.color;
-    this.z = obj.z;
-  }
-
-  _createClass(MovingObject, [{
-    key: "draw",
-    value: function draw(ctx) {
-      ctx.fillStyle = this.color;
-      ctx.beginPath();
-      ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
-      var grd = createGradient(ctx, this.pos, this.radius, this.z);
-      ctx.fillStyle = grd;
-      ctx.fill();
-    }
-  }, {
-    key: "move",
-    value: function move() {
-      this.pos[0] += this.vel[0];
-      this.pos[1] += this.vel[1];
-    }
-  }, {
-    key: "isCollidedWith",
-    value: function isCollidedWith(otherObject) {
-      var z1 = this.z;
-      var z2 = otherObject.z;
-
-      if (z1 === z2) {
-        var distanceBetweenCenters = Object(_util__WEBPACK_IMPORTED_MODULE_0__["straightLineDistance"])(this.pos, otherObject.pos);
-        var distanceWithRadius = distanceBetweenCenters - (this.radius + otherObject.radius);
-        return distanceWithRadius <= 0;
-      } else return false;
-    }
-  }]);
-
-  return MovingObject;
-}();
-
-/* harmony default export */ __webpack_exports__["default"] = (MovingObject);
-
-/***/ }),
-
-/***/ "./src/objs/ship.js":
-/*!**************************!*\
-  !*** ./src/objs/ship.js ***!
-  \**************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _movingObject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./movingObject */ "./src/objs/movingObject.js");
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-
-var COLOR = "darkMagenta";
-var RADIUS = 10;
-
-var Ship = /*#__PURE__*/function (_MovingObject) {
-  _inherits(Ship, _MovingObject);
-
-  var _super = _createSuper(Ship);
-
-  function Ship(obj) {
-    _classCallCheck(this, Ship);
-
-    return _super.call(this, {
-      game: obj.game,
-      pos: obj.pos,
-      color: obj.color || COLOR,
-      radius: RADIUS,
-      vel: [0, 0],
-      z: 0
-    });
-  }
-
-  _createClass(Ship, [{
-    key: "draw",
-    value: function draw(ctx) {
-      ctx.fillStyle = this.color;
-      ctx.beginPath();
-      ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
-      var grd = ctx.createLinearGradient(0, 0, 0, 500);
-      grd.addColorStop(0, "#555");
-      grd.addColorStop(1, "#F00");
-      ctx.fillStyle = grd;
-      ctx.fill();
-    }
-  }]);
-
-  return Ship;
-}(_movingObject__WEBPACK_IMPORTED_MODULE_0__["default"]);
-
-/* harmony default export */ __webpack_exports__["default"] = (Ship);
-
-/***/ }),
-
 /***/ "./src/util.js":
 /*!*********************!*\
   !*** ./src/util.js ***!
   \*********************/
-/*! exports provided: randomVec, scale, straightLineDistance, genID, getOffset */
+/*! exports provided: randomVec, scale, straightLineDistance, genID, getOffset, genRandAngle, genRandInt, genRandNum, genPosFromTheta, withinXangle */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -34047,6 +33799,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "straightLineDistance", function() { return straightLineDistance; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "genID", function() { return genID; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getOffset", function() { return getOffset; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "genRandAngle", function() { return genRandAngle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "genRandInt", function() { return genRandInt; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "genRandNum", function() { return genRandNum; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "genPosFromTheta", function() { return genPosFromTheta; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "withinXangle", function() { return withinXangle; });
+/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! paper */ "./node_modules/paper/dist/paper-full.js");
+/* harmony import */ var paper__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(paper__WEBPACK_IMPORTED_MODULE_0__);
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -34058,6 +33817,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 var randomVec = function randomVec(length) {
   var deg = 2 * Math.PI * Math.random();
@@ -34090,6 +33850,27 @@ var getOffset = function getOffset(element) {
     top: bound.top + window.pageYOffset - html.clientTop,
     left: bound.left + window.pageXOffset - html.clientLeft
   };
+};
+var genRandAngle = function genRandAngle() {
+  return Math.random() * 2 * Math.PI;
+};
+var genRandInt = function genRandInt() {
+  var min = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var max = arguments.length > 1 ? arguments[1] : undefined;
+  return Math.floor(Math.random() * (max - min) + min);
+};
+var genRandNum = function genRandNum() {
+  var min = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var max = arguments.length > 1 ? arguments[1] : undefined;
+  return Math.random() * (max - min) + min;
+};
+var genPosFromTheta = function genPosFromTheta(center, theta, altitude) {
+  var x = center.x - altitude * Math.cos(theta);
+  var y = center.y - altitude * Math.sin(theta);
+  return new paper__WEBPACK_IMPORTED_MODULE_0__["Point"](x, y);
+};
+var withinXangle = function withinXangle(obj, baseAngle, range) {
+  return new Boolean(Math.abs(obj.angle - baseAngle) <= range / 2);
 };
 
 /***/ }),

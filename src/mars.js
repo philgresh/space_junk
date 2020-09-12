@@ -14,7 +14,6 @@ export default class Mars {
     this.CENTER_Y = this.height / 2;
     this.MARS_RADIUS = this.width * MARS_SIZE;
     this.ATMOSPHERE_RADIUS = this.MARS_RADIUS * 1.4;
-    this.resizeMars(canvas);
     this.renderBackgroundGradient();
     this.renderForegroundGradients();
 
@@ -78,48 +77,4 @@ export default class Mars {
     this.ctx.closePath();
   }
 
-  // renderShadow() {
-  //   // debugger;
-  //   // Draw foreground Mars with reflection/shadow
-  //   let gradient = this.ctx.createRadialGradient(
-  //     this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.85,
-  //     this.CENTER_Y,
-  //     0.1,
-  //     this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.5,
-  //     this.CENTER_Y,
-  //     this.ATMOSPHERE_RADIUS
-  //   );
-  //   gradient.addColorStop(0, '#10101044');
-  //   gradient.addColorStop(0.7, '#10101099');
-  //   gradient.addColorStop(1, '#10101000');
-
-  //   this.ctx.beginPath();
-  //   this.ctx.fillStyle = gradient;
-  //   this.ctx.arc(
-  //     this.CENTER_X,
-  //     this.CENTER_Y,
-  //     this.ATMOSPHERE_RADIUS,
-  //     0,
-  //     2 * Math.PI
-  //   );
-  //   this.ctx.fill();
-  //   this.ctx.closePath();
-  // }
-
-  resizeCanvas(canvas) {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-
-  resizeMars() {
-    const $marsImg = $('#mars img');
-    $marsImg.height(this.MARS_RADIUS * 2);
-    $marsImg.offset({
-      top: this.CENTER_Y - this.MARS_RADIUS,
-      left: this.CENTER_X - this.MARS_RADIUS,
-    });
-    $marsImg.css('clip-path', `circle(${this.MARS_RADIUS}px at center)`);
-  }
 }

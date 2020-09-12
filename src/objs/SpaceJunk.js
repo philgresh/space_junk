@@ -1,13 +1,13 @@
+import {Rectangle} from 'paper';
 import { randomVec } from '../util';
-import MovingObject from './movingObject.js';
+import MovingObject from './MovingObject.js';
 
 const COLOR = '#333';
 const RADIUS = 20;
 
-class Asteroid extends MovingObject {
+class SpaceJunk extends MovingObject {
   constructor(obj) {
     super({
-      game: obj.game,
       pos: obj.pos,
       color: obj.color || COLOR,
       radius: obj.radius || RADIUS,
@@ -17,4 +17,4 @@ class Asteroid extends MovingObject {
   }
 }
 
-export default Asteroid;
+export default SpaceJunk;

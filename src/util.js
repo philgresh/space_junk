@@ -1,3 +1,5 @@
+import { Point } from 'paper';
+
 export const randomVec = (length) => {
   const deg = 2 * Math.PI * Math.random();
   return scale([Math.sin(deg), Math.cos(deg)], length);
@@ -28,4 +30,19 @@ export const getOffset = (element) => {
     top: bound.top + window.pageYOffset - html.clientTop,
     left: bound.left + window.pageXOffset - html.clientLeft,
   };
+};
+
+export const genRandAngle = () => Math.random() * 2 * Math.PI;
+export const genRandInt = (min = 0, max) =>
+  Math.floor(Math.random() * (max - min) + min);
+export const genRandNum = (min = 0, max) => Math.random() * (max - min) + min;
+
+export const genPosFromTheta = (center, theta, altitude) => {
+  const x = center.x - altitude * Math.cos(theta);
+  const y = center.y - altitude * Math.sin(theta);
+  return new Point(x, y);
+};
+
+export const withinXangle = (obj, baseAngle, range) => {
+  return new Boolean(Math.abs(obj.angle - baseAngle) <= range / 2);
 };

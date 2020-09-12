@@ -36,7 +36,7 @@ canvas {
   left: 0;
   width: 100%;
   height: 100%;
-  clip-path: circle(11% at center);
+  clip-path: circle(126px at center center);
   background: rgb(0, 0, 0);
   background: -moz-linear-gradient(
     90deg,
@@ -52,7 +52,7 @@ canvas {
   );
   background: linear-gradient(
     90deg,
-    rgba(0, 0, 0, 0) 0%,
+    rgb(255, 255, 255) 0%,
     rgba(0, 0, 0, 0.25) 45%,
     rgba(0, 0, 0, 0.85) 55%
   );
@@ -60,8 +60,16 @@ canvas {
 }
 
 #mars img {
-  /*! position: absolute; */
   z-index: -1;
+  height: 300px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  clip-path: circle(125px at center center);
+  transform: translate(-50%, -50%);
+  width: 300px;
+  margin-top: -150px;
+  margin-left: -150px;
 }
 
 .station-parent {
