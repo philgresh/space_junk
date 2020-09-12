@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import Station from './objs/station';
-const MARS_SIZE = 0.1; // Percent of screen width
+
+export const MARS_SIZE = 0.1; // Percent of screen width
 
 export default class Mars {
   constructor(paperScope) {
@@ -17,8 +17,6 @@ export default class Mars {
     this.resizeMars(canvas);
     this.renderBackgroundGradient();
     this.renderForegroundGradients();
-    // this.renderShadow();
-    // this.station1 = new Station($('.station-parent'));
 
     window.addEventListener('resize', this.resizeCanvas);
   }
@@ -80,33 +78,33 @@ export default class Mars {
     this.ctx.closePath();
   }
 
-  renderShadow() {
-    // debugger;
-    // Draw foreground Mars with reflection/shadow
-    let gradient = this.ctx.createRadialGradient(
-      this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.85,
-      this.CENTER_Y,
-      0.1,
-      this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.5,
-      this.CENTER_Y,
-      this.ATMOSPHERE_RADIUS
-    );
-    gradient.addColorStop(0, '#10101044');
-    gradient.addColorStop(0.7, '#10101099');
-    gradient.addColorStop(1, '#10101000');
+  // renderShadow() {
+  //   // debugger;
+  //   // Draw foreground Mars with reflection/shadow
+  //   let gradient = this.ctx.createRadialGradient(
+  //     this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.85,
+  //     this.CENTER_Y,
+  //     0.1,
+  //     this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.5,
+  //     this.CENTER_Y,
+  //     this.ATMOSPHERE_RADIUS
+  //   );
+  //   gradient.addColorStop(0, '#10101044');
+  //   gradient.addColorStop(0.7, '#10101099');
+  //   gradient.addColorStop(1, '#10101000');
 
-    this.ctx.beginPath();
-    this.ctx.fillStyle = gradient;
-    this.ctx.arc(
-      this.CENTER_X,
-      this.CENTER_Y,
-      this.ATMOSPHERE_RADIUS,
-      0,
-      2 * Math.PI
-    );
-    this.ctx.fill();
-    this.ctx.closePath();
-  }
+  //   this.ctx.beginPath();
+  //   this.ctx.fillStyle = gradient;
+  //   this.ctx.arc(
+  //     this.CENTER_X,
+  //     this.CENTER_Y,
+  //     this.ATMOSPHERE_RADIUS,
+  //     0,
+  //     2 * Math.PI
+  //   );
+  //   this.ctx.fill();
+  //   this.ctx.closePath();
+  // }
 
   resizeCanvas(canvas) {
     this.width = window.innerWidth;

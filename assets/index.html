@@ -14,26 +14,98 @@
   <body>
     <canvas id="game-canvas" data-paper-resize="true"></canvas>
     <div id="mars">
-      <div class="overlay"></div>
       <img
         src="../assets/mars_pole.jpg"
         alt="Mars Polar Ice Cap"
         class="rotate"
       />
       <div class="station-parent">
-        <svg viewbox="0,0 10,10" width="100%" height="100%" class="station">
-          <!-- the path to be animated along -->
-          <path
+        <!-- <svg viewbox="0,0 10,10" width="100%" height="100%" class="station"> -->
+        <!-- the path to be animated along -->
+        <!-- <path
             class="track"
             fill="none"
             stroke-width="0.25"
             d="M 5 5 m -4, 0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0"
-          />
-          <!-- the mover -->
-          <rect width="1" height="1" class="marker" />
+          /> -->
+        <!-- the mover -->
+        <!-- <rect width="1" height="1" class="marker" /> -->
+        <!-- </svg> -->
+        <svg
+          class="circle-segment"
+          class="circle-wrap"
+          xmlns="http://www.w3.org/2000/svg"
+          version="1.1"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          height="100%"
+          width="100%"
+        >
+          <!-- <path
+            id="station-1"
+            d="M 200 125 m 0 -25 l -12.5 25 l 25 0 z "
+            fill="#066a8e"
+          >
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="rotate"
+              from="360 200 200"
+              to="00 200 200"
+              dur="20s"
+              repeatCount="indefinite"
+            />
+          </path> -->
+          <path
+            d="M 201.288 74 L 219.135 104.913 L 183.441 104.913 L 201.288 74 Z"
+            style="fill: rgb(106, 224, 128)"
+            bx:shape="triangle 183.441 74 35.694 30.913 0.5 0 1@9c3bf3d8"
+            bx:origin="0.514344 3.234885"
+          >
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="rotate"
+              from="360 200 200"
+              to="00 200 200"
+              dur="20s"
+              repeatCount="indefinite"
+            />
+          </path>
+          <path
+            d="M 297.716 241.892 L 315.563 272.805 L 279.869 272.805 L 297.716 241.892 Z"
+            style="fill: rgb(106, 224, 128)"
+            bx:shape="triangle 279.869 241.892 35.694 30.913 0.5 0 1@ad148cd3"
+            bx:origin="-2.187174 -2.196228"
+          >
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="rotate"
+              from="360 200 200"
+              to="00 200 200"
+              dur="20s"
+              repeatCount="indefinite"
+            />
+          </path>
+          <path
+            d="M 103.847 243.087 L 121.694 274 L 86 274 L 103.847 243.087 Z"
+            style="fill: rgb(106, 224, 128)"
+            bx:shape="triangle 86 243.087 35.694 30.913 0.5 0 1@1496c6a1"
+            bx:origin="3.244243 -2.234886"
+          >
+            <animateTransform
+              attributeName="transform"
+              attributeType="XML"
+              type="rotate"
+              from="360 200 200"
+              to="00 200 200"
+              dur="20s"
+              repeatCount="indefinite"
+            />
+          </path>
         </svg>
       </div>
-      <canvas></canvas>
     </div>
+    <div class="overlay"></div>
   </body>
 </html>

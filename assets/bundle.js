@@ -33676,21 +33676,20 @@ document.addEventListener('DOMContentLoaded', function () {
 /*!*********************!*\
   !*** ./src/mars.js ***!
   \*********************/
-/*! exports provided: default */
+/*! exports provided: MARS_SIZE, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MARS_SIZE", function() { return MARS_SIZE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Mars; });
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _objs_station__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./objs/station */ "./src/objs/station.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 
 
 var MARS_SIZE = 0.1; // Percent of screen width
@@ -33710,9 +33709,7 @@ var Mars = /*#__PURE__*/function () {
     this.ATMOSPHERE_RADIUS = this.MARS_RADIUS * 1.4;
     this.resizeMars(canvas);
     this.renderBackgroundGradient();
-    this.renderForegroundGradients(); // this.renderShadow();
-    // this.station1 = new Station($('.station-parent'));
-
+    this.renderForegroundGradients();
     window.addEventListener('resize', this.resizeCanvas);
   }
 
@@ -33746,22 +33743,33 @@ var Mars = /*#__PURE__*/function () {
       this.ctx.arc(this.CENTER_X, this.CENTER_Y, this.MARS_RADIUS, 0, 2 * Math.PI);
       this.ctx.fill();
       this.ctx.closePath();
-    }
-  }, {
-    key: "renderShadow",
-    value: function renderShadow() {
-      // debugger;
-      // Draw foreground Mars with reflection/shadow
-      var gradient = this.ctx.createRadialGradient(this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.85, this.CENTER_Y, 0.1, this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.5, this.CENTER_Y, this.ATMOSPHERE_RADIUS);
-      gradient.addColorStop(0, '#10101044');
-      gradient.addColorStop(0.7, '#10101099');
-      gradient.addColorStop(1, '#10101000');
-      this.ctx.beginPath();
-      this.ctx.fillStyle = gradient;
-      this.ctx.arc(this.CENTER_X, this.CENTER_Y, this.ATMOSPHERE_RADIUS, 0, 2 * Math.PI);
-      this.ctx.fill();
-      this.ctx.closePath();
-    }
+    } // renderShadow() {
+    //   // debugger;
+    //   // Draw foreground Mars with reflection/shadow
+    //   let gradient = this.ctx.createRadialGradient(
+    //     this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.85,
+    //     this.CENTER_Y,
+    //     0.1,
+    //     this.CENTER_X + this.ATMOSPHERE_RADIUS * 0.5,
+    //     this.CENTER_Y,
+    //     this.ATMOSPHERE_RADIUS
+    //   );
+    //   gradient.addColorStop(0, '#10101044');
+    //   gradient.addColorStop(0.7, '#10101099');
+    //   gradient.addColorStop(1, '#10101000');
+    //   this.ctx.beginPath();
+    //   this.ctx.fillStyle = gradient;
+    //   this.ctx.arc(
+    //     this.CENTER_X,
+    //     this.CENTER_Y,
+    //     this.ATMOSPHERE_RADIUS,
+    //     0,
+    //     2 * Math.PI
+    //   );
+    //   this.ctx.fill();
+    //   this.ctx.closePath();
+    // }
+
   }, {
     key: "resizeCanvas",
     value: function resizeCanvas(canvas) {
@@ -34022,118 +34030,6 @@ var Ship = /*#__PURE__*/function (_MovingObject) {
 }(_movingObject__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (Ship);
-
-/***/ }),
-
-/***/ "./src/objs/station.js":
-/*!*****************************!*\
-  !*** ./src/objs/station.js ***!
-  \*****************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Station; });
-/* harmony import */ var _svg__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./svg */ "./src/objs/svg.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-var Station = /*#__PURE__*/function () {
-  function Station($parent) {
-    var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'cannon';
-    var position = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [0, 0];
-
-    _classCallCheck(this, Station);
-
-    this.parent = $parent;
-    this.type = type;
-    this.position = position;
-    this.render();
-  }
-
-  _createClass(Station, [{
-    key: "render",
-    value: function render() {// const newNode = new SVG();
-      // this.parent.append(newNode);
-    }
-  }]);
-
-  return Station;
-}();
-
-
-
-/***/ }),
-
-/***/ "./src/objs/svg.js":
-/*!*************************!*\
-  !*** ./src/objs/svg.js ***!
-  \*************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SVG; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var SVG = /*#__PURE__*/function () {
-  function SVG() {
-    var viewbox = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '0,0 10,10';
-    var childType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'triangle';
-    var otherChildren = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-    _classCallCheck(this, SVG);
-
-    this.viewbox = viewbox;
-    this.childType = childType;
-    this.otherChildren = otherChildren;
-    this.self = document.createElement('svg');
-    this.setup();
-    return this.self;
-  }
-
-  _createClass(SVG, [{
-    key: "setup",
-    value: function setup() {
-      this.self.setAttribute('viewbox', this.viewbox);
-      this.self.setAttribute('class', 'station');
-      this.self.appendChild(path());
-      this.self.appendChild(rect());
-    }
-  }]);
-
-  return SVG;
-}();
-
-
-
-var rect = function rect() {
-  var self = document.createElement('rect');
-  self.setAttribute('height', '1');
-  self.setAttribute('width', '1');
-  self.className = 'marker';
-  return self;
-};
-
-var path = function path() {
-  var self = document.createElement('path');
-  self.setAttribute('d', 'M 5 5 m -4, 0 a 4,4 0 1,0 8,0 a 4,4 0 1,0 -8,0');
-  self.setAttribute('stroke-width', '0.25');
-  self.setAttribute('fill', 'none');
-  self.className = 'track';
-  return self;
-};
 
 /***/ }),
 
