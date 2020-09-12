@@ -95,12 +95,12 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: isDevelopment ? '[name].css' : '[name].[hash].css',
-      chunkFilename: isDevelopment ? '[id].css' : '[id].[hash].css',
+      filename: '[name].css',
+      chunkFilename: '[id].css',
     }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      filename: 'index.html',
+      filename: './index.html',
       inject: true,
       template: path.resolve(__dirname, 'src', 'index.html'),
     }),

@@ -10,7 +10,7 @@
     "deploy": "gh-pages -b gh-pages -d dist",
     "build": "webpack --config=webpack.config.prod.js",
     "build-dev": "webpack --config=webpack.config.dev.js",
-    "start": "webpack-dev-server --config=webpack.config.dev.js --color"
+    "start": "webpack-dev-server --config webpack.config.dev.js --color"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +28,7 @@
     "css-loader": "^4.3.0",
     "file-loader": "^6.1.0",
     "gh-pages": "^3.1.0",
+    "html-loader": "^1.3.0",
     "html-webpack-plugin": "^4.4.1",
     "image-webpack-loader": "^7.0.0",
     "mini-css-extract-plugin": "^0.11.1",
