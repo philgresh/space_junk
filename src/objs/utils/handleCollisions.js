@@ -1,7 +1,11 @@
 import { Size } from 'paper';
-import { genRandNum } from './util';
+import genJunk from './genJunk';
 
 const NEAREST_NEIGHBORS_TO_CHECK = 5;
+const MIN_AREA_SIDE = 5;
+const COLLISION_SIZE_DIVISION = 1.4;
+const MAX_ANGLE_RATE = 1.3;
+const MIN_ANGLE_RATE = -1.3;
 
 const nearestNeighbors = (junks, index, num = NEAREST_NEIGHBORS_TO_CHECK) => {
   const neighbors = [];
@@ -28,41 +32,53 @@ export const checkCollisions = (junks) => {
   return collisions;
 };
 
-export const breakUpCollision = (a, b, genJunk, DESCENT_RATE) => {
-  let altitude = Math.max(a.altitude, b.altitude);
+const average = (a, b) => Math.abs(a - b) / 2 + Math.min(a, b);
+
+export const breakUpCollision = (a, b, center, DESCENT_RATE) => {
+  const largerFillColor =
+    Size.max(a.size, b.size) === a.size ? a.fillColor : b.fillColor;
+  const altitude = average(a.altitude, b.altitude);
+
   let angleRate = a.angleRate + b.angleRate;
-  let descentRate = Math.max(
-    Math.min(a.descentRate, b.descentRate) * 2,
-    DESCENT_RATE
-  );
-  let size = Size.max(a.size.divide(2), b.size.divide(2));
-  let theta = Math.max(a.theta, b.theta) + genRandNum(-1, 1);
+  angleRate = Math.max(angleRate, MAX_ANGLE_RATE);
+  angleRate = Math.min(angleRate, MIN_ANGLE_RATE);
 
-  const maxJunk = genJunk({
+  const descentRate = Math.max(
+    average(a.descentRate, b.descentRate),
+    DESCENT_RATE,
+  );
+  const theta = average(a.theta, b.theta);
+
+  a.set({
     altitude,
     angleRate,
     descentRate,
-    size,
     theta,
+    size: a.size.divide(COLLISION_SIZE_DIVISION),
   });
-
-  altitude = Math.min(a.altitude, b.altitude);
-  angleRate = a.angleRate + b.angleRate;
-  descentRate = Math.min(
-    Math.max(a.descentRate, b.descentRate) / 2,
-    DESCENT_RATE
-  );
-  size = Size.min(a.size.divide(2), b.size.divide(2));
-  theta = Math.min(a.theta, b.theta) + genRandNum(-1, 1);
-
-  const minJunk = genJunk({
+  b.set({
     altitude,
     angleRate,
     descentRate,
-    size,
     theta,
+    size: b.size.divide(COLLISION_SIZE_DIVISION),
   });
-  a.remove();
-  b.remove();
-  return [maxJunk, minJunk];
+
+  const newJunk = genJunk(
+    {
+      altitude,
+      angleRate,
+      descentRate,
+      size: Size.max(
+        a.size.divide(COLLISION_SIZE_DIVISION),
+        b.size.divide(COLLISION_SIZE_DIVISION),
+        new Size(MIN_AREA_SIDE, MIN_AREA_SIDE),
+      ),
+      theta,
+    },
+    center,
+    largerFillColor,
+  );
+
+  return [newJunk];
 };

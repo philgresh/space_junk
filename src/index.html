@@ -10,76 +10,51 @@
   </head>
 
   <body>
-    <canvas id="game-canvas" data-paper-resize="true"></canvas>
-    <div id="mars">
-      <img alt="Mars Polar Ice Cap" class="rotate" />
-      <div class="station-parent">
-        <svg height="100%" width="100%">
-          <path
-            d="M 201.288 60 L 219.135 90 L 183.441 90 L 201.288 60 Z"
-            style="fill: rgb(45, 179, 231)"
-            bx:shape="triangle 183.441 74 35.694 30.913 0.5 0 1@9c3bf3d8"
-            bx:origin="0.514344 3.234885"
-            id="station-1"
-          >
-            <animateTransform
-              attributeName="transform"
-              attributeType="XML"
-              type="rotate"
-              from="360 200 200"
-              to="00 200 200"
-              dur="20s"
-              repeatCount="indefinite"
-            />
-          </path>
-          <path
-            d="M 297.716 241.892 L 315.563 272.805 L 279.869 272.805 L 297.716 241.892 Z"
-            style="fill: rgb(238, 225, 44)"
-            bx:shape="triangle 279.869 241.892 35.694 30.913 0.5 0 1@ad148cd3"
-            bx:origin="-2.187174 -2.196228"
-          >
-            <animateTransform
-              attributeName="transform"
-              attributeType="XML"
-              type="rotate"
-              from="360 200 200"
-              to="00 200 200"
-              dur="20s"
-              repeatCount="indefinite"
-            />
-          </path>
-          <path
-            d="M 103.847 243.087 L 121.694 274 L 86 274 L 103.847 243.087 Z"
-            style="fill: rgb(236, 65, 122)"
-            bx:shape="triangle 86 243.087 35.694 30.913 0.5 0 1@1496c6a1"
-            bx:origin="3.244243 -2.234886"
-          >
-            <animateTransform
-              attributeName="transform"
-              attributeType="XML"
-              type="rotate"
-              from="360 200 200"
-              to="00 200 200"
-              dur="20s"
-              repeatCount="indefinite"
-            />
-          </path>
-        </svg>
-      </div>
-    </div>
-    <div class="overlay"></div>
-    <div class="game-controls">
-      <div class="top">
-        <div class="score">SCORE</div>
-        <div class="controls">
-          <button id="new-game" type="button">New Game</button>
+    <div id="container">
+      <canvas id="game-canvas" data-paper-resize="true"></canvas>
+      <div id="mars">
+        <div class="mars-pole rotate"></div>
+        <div class="overlay"></div>
+        <div class="station-parent rotate">
+          <svg height="100%" width="100%">
+            <path
+              d="M 201.288 60 L 219.135 90 L 183.441 90 L 201.288 60 Z"
+              style="fill: rgb(45, 179, 231)"
+              bx:shape="triangle 183.441 74 35.694 30.913 0.5 0 1@9c3bf3d8"
+              bx:origin="0.514344 3.234885"
+              id="stationA"
+            ></path>
+            <path
+              d="M 297.716 241.892 L 315.563 272.805 L 279.869 272.805 L 297.716 241.892 Z"
+              style="fill: rgb(238, 225, 44)"
+              bx:shape="triangle 279.869 241.892 35.694 30.913 0.5 0 1@ad148cd3"
+              bx:origin="-2.187174 -2.196228"
+              id="stationB"
+            ></path>
+            <path
+              d="M 103.847 243.087 L 121.694 274 L 86 274 L 103.847 243.087 Z"
+              style="fill: rgb(236, 65, 122)"
+              bx:shape="triangle 86 243.087 35.694 30.913 0.5 0 1@1496c6a1"
+              bx:origin="3.244243 -2.234886"
+              id="stationC"
+            ></path>
+          </svg>
         </div>
       </div>
-      <div class="bottom">
-        <div class="credits">BY PHIL</div>
-        <div class="instructions">
-          <button id="instructions" type="button">Instructions</button>
-          <button id="instructions" type="button">High Scores</button>
+      
+      <div class="game-controls">
+        <div class="top">
+          <div class="score">SCORE:&nbsp;<span>0</span></div>
+          <div class="controls">
+            <button id="new-game" type="button">New Game</button>
+          </div>
+        </div>
+        <div class="bottom">
+          <div class="credits">BY PHIL</div>
+          <div class="instructions">
+            <button id="instructions" type="button">Instructions</button>
+            <button id="instructions" type="button">High Scores</button>
+          </div>
         </div>
       </div>
     </div>

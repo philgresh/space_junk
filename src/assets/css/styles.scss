@@ -26,22 +26,48 @@ canvas {
   left: 0;
 }
 
-#mars {
+#container {
   position: relative;
+  top: 0;
+  left: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
 }
 
-#mars > img {
-  background-image: '../images/mars_pole.jpg';
-  z-index: -1;
-  height: 300px;
+#mars {
   position: fixed;
-  top: 50%;
   left: 50%;
-  clip-path: circle(125px at center center);
-  transform: translate(-50%, -50%);
-  width: 300px;
-  margin-top: -150px;
-  margin-left: -150px;
+  top: 50%;
+  width: 400px;
+  height: 400px;
+  margin-left: -200px;
+  margin-top: -200px;
+
+  & .mars-pole {
+    background-image: url('../images/mars_pole_600x600.png');
+    filter: drop-shadow(0 0 150px rgba(255, 255, 255, 0.534));
+    clip-path: circle(150px at center center);
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  & .station-parent {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 400px;
+    height: 400px;
+    z-index: 2;
+  }
+}
+
+.rotate {
+  -webkit-animation: rotation 20s linear infinite;
+  -moz-animation: rotation 20s linear infinite;
+  animation: rotation 20s linear infinite;
 }
 
 .overlay {
@@ -50,38 +76,28 @@ canvas {
   left: 0;
   width: 100%;
   height: 100%;
-  clip-path: circle(126px at center center);
-  background: rgb(0, 0, 0);
+  clip-path: circle(152px at center center);
+  z-index: 3;
+  background: rgb(255, 255, 255);
   background: -moz-linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.25) 45%,
-    rgba(0, 0, 0, 0.85) 55%
+    55deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(0, 0, 0, 0.25) 43%,
+    rgba(0, 0, 0, 0.85) 52%
   );
   background: -webkit-linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.25) 45%,
-    rgba(0, 0, 0, 0.85) 55%
+    55deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(0, 0, 0, 0.25) 43%,
+    rgba(0, 0, 0, 0.85) 52%
   );
   background: linear-gradient(
-    90deg,
-    rgb(255, 255, 255) 0%,
-    rgba(0, 0, 0, 0.25) 45%,
-    rgba(0, 0, 0, 0.85) 55%
+    55deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(0, 0, 0, 0.25) 43%,
+    rgba(0, 0, 0, 0.85) 52%
   );
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#000000",endColorstr="#000000",GradientType=1);
-}
-
-.station-parent {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 400px;
-  height: 400px;
-  /* border: 1px solid red; */
-  /*! border-radius: 50%; */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff",endColorstr="#000000",GradientType=1);
 }
 
 .station {
@@ -104,10 +120,6 @@ canvas {
   display: none;
 }
 
-.rotate {
-  animation: rotation 20s infinite linear;
-}
-
 .game-controls {
   position: absolute;
   top: 0;
@@ -115,8 +127,8 @@ canvas {
   margin: 0;
   padding: 1rem;
   color: white;
-  width: calc(100% - 2rem);
-  height: calc(100% - 2rem);
+  width: calc(100vw - 2rem);
+  height: calc(100vh - 2rem);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -140,7 +152,12 @@ canvas {
   }
 
   & .bottom {
+    color: #eee;
   }
+}
+
+.filter {
+  filter: drop-shadow(0px 0 7px '#fff');
 }
 
 @keyframes rotation {
