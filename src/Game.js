@@ -23,31 +23,31 @@ export default class Game {
     this.addPoints = this.addPoints.bind(this);
     this.junks = [];
     this.orbits = [
-      // new Orbit({
-      //   paperScope: this.paperScope,
-      //   numJunks: 20,
-      //   radius: 300,
-      //   addPoints: this.addPoints,
-      // junks: this.junks,
-      // }),
-      // new Orbit({
-      //   paperScope: this.paperScope,
-      //   numJunks: 20,
-      //   radius: 500,
-      //   color: 'green',
-      //   addPoints: this.addPoints,
-      //   descentRateAccel: 2,
-      // junks: this.junks,
-      // }),
-      // new Orbit({
-      //   paperScope: this.paperScope,
-      //   numJunks: 30,
-      //   radius: 750,
-      //   color: 'orange',
-      //   addPoints: this.addPoints,
-      // descentRateAccel: 1.5,
-      // junks: this.junks,
-      // }),
+      new Orbit({
+        paperScope: this.paperScope,
+        numJunks: 20,
+        radius: 400,
+        addPoints: this.addPoints,
+        junks: this.junks,
+      }),
+      new Orbit({
+        paperScope: this.paperScope,
+        numJunks: 20,
+        radius: 500,
+        color: 'green',
+        addPoints: this.addPoints,
+        descentRateAccel: 2,
+        junks: this.junks,
+      }),
+      new Orbit({
+        paperScope: this.paperScope,
+        numJunks: 30,
+        radius: 750,
+        color: 'orange',
+        addPoints: this.addPoints,
+        descentRateAccel: 1.5,
+        junks: this.junks,
+      }),
     ];
 
     paperScope.view.onFrame = (e) => {
