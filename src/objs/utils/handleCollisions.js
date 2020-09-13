@@ -1,7 +1,9 @@
 import { Size } from 'paper';
 import { genRandNum } from './util';
+import genJunk from './genJunk';
 
 const NEAREST_NEIGHBORS_TO_CHECK = 5;
+const MIN_AREA_SIDE = 5;
 
 const nearestNeighbors = (junks, index, num = NEAREST_NEIGHBORS_TO_CHECK) => {
   const neighbors = [];
@@ -28,41 +30,52 @@ export const checkCollisions = (junks) => {
   return collisions;
 };
 
-export const breakUpCollision = (a, b, genJunk, DESCENT_RATE) => {
+export const breakUpCollision = (a, b, center, DESCENT_RATE) => {
   let altitude = Math.max(a.altitude, b.altitude);
   let angleRate = a.angleRate + b.angleRate;
   let descentRate = Math.max(
     Math.min(a.descentRate, b.descentRate) * 2,
-    DESCENT_RATE
+    DESCENT_RATE,
   );
-  let size = Size.max(a.size.divide(2), b.size.divide(2));
+  let size = Size.max(a.size.divide(1.4), b.size.divide(1.4));
   let theta = Math.max(a.theta, b.theta) + genRandNum(-1, 1);
 
-  const maxJunk = genJunk({
-    altitude,
-    angleRate,
-    descentRate,
-    size,
-    theta,
-  });
+  const maxJunk = genJunk(
+    {
+      altitude,
+      angleRate,
+      descentRate,
+      size,
+      theta,
+    },
+    center,
+    a.fillColor,
+  );
 
   altitude = Math.min(a.altitude, b.altitude);
   angleRate = a.angleRate + b.angleRate;
   descentRate = Math.min(
     Math.max(a.descentRate, b.descentRate) / 2,
-    DESCENT_RATE
+    DESCENT_RATE,
   );
-  size = Size.min(a.size.divide(2), b.size.divide(2));
   theta = Math.min(a.theta, b.theta) + genRandNum(-1, 1);
 
-  const minJunk = genJunk({
-    altitude,
-    angleRate,
-    descentRate,
-    size,
-    theta,
-  });
+  const newJunks = [maxJunk];
+  if (size.width > MIN_AREA_SIDE && size.height > MIN_AREA_SIDE) {
+    const minJunk = genJunk(
+      {
+        altitude,
+        angleRate,
+        descentRate,
+        size,
+        theta,
+      },
+      center,
+      b.fillColor,
+    );
+    newJunks.push(minJunk);
+  }
   a.remove();
   b.remove();
-  return [maxJunk, minJunk];
+  return newJunks;
 };

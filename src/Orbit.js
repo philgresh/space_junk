@@ -1,28 +1,18 @@
-import { Point, Size, Path, Color } from 'paper';
-
-import {
-  genRandAngle,
-  genRandNum,
-  genRandInt,
-  genPosFromTheta,
-} from './objs/utils/util';
+import { Point, Path } from 'paper';
+import genJunk from './objs/utils/genJunk';
+import { genPosFromTheta } from './objs/utils/util';
 import {
   checkCollisions,
   breakUpCollision,
 } from './objs/utils/handleCollisions';
 
-const MIN_RECT_SIZE = 20;
-const MAX_RECT_SIZE = 50;
-const ORBIT_RADIUS_RANGE = 50;
 const MARS_SURFACE_RADIUS = 125;
 
 const MAX_DELTA = 3;
 const STEPS = 10;
 const DELTA_ACCELERATE_FACTOR = 1 / 10;
-const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 30;
-const FRAMES_BETWEEN_COLLISION_CHECKS = 200;
-const COLLISION_CHECK_ANGLE = (Math.PI * 2) / 18;
-const POINTS_DEDUCTION_MULTIPLIER = 1;
+const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 25;
+const FRAMES_BETWEEN_COLLISION_CHECKS = 20;
 
 export default class Orbit {
   constructor(params) {
@@ -39,9 +29,8 @@ export default class Orbit {
     // this.drawOrbitCircle();
     this.marsSurface = new Path.Circle(
       new Point(this.center),
-      MARS_SURFACE_RADIUS
+      MARS_SURFACE_RADIUS,
     );
-    this.genJunk = this.genJunk.bind(this);
   }
 
   drawOrbitCircle() {
@@ -49,44 +38,9 @@ export default class Orbit {
     orbit1.strokeColor = this.color;
   }
 
-  genJunk(params) {
-    const {
-      altitude = genRandNum(
-        this.radius - ORBIT_RADIUS_RANGE / 2,
-        this.radius + ORBIT_RADIUS_RANGE / 2
-      ),
-      angle = genRandInt(0, 360),
-      angleRate = genRandNum(-1, 1),
-      descentRate = DESCENT_RATE,
-      theta = genRandAngle(),
-      position = genPosFromTheta(this.center, theta, altitude),
-      size = new Size(
-        genRandNum(MIN_RECT_SIZE, MAX_RECT_SIZE),
-        genRandNum(MIN_RECT_SIZE, MAX_RECT_SIZE)
-      ),
-    } = params;
-
-    const newRect = new Path.Rectangle(position, size);
-    newRect.position = position;
-    newRect.theta = theta;
-    newRect.altitude = altitude;
-    newRect.angle = angle;
-    newRect.angleRate = angleRate;
-    newRect.descentRate = descentRate;
-    newRect.size = size;
-    newRect.rotate(angle);
-    newRect.strokeColor = this.color;
-    newRect.strokeWidth = 2;
-    const alpha = genRandNum(0.4, 1);
-    newRect.fillColor = new Color(this.color);
-    newRect.fillColor.alpha = alpha;
-
-    return newRect;
-  }
-
   genJunks(numJunks = this.numJunks) {
     for (let i = 0; i < numJunks; i += 1) {
-      const newRect = this.genJunk({});
+      const newRect = genJunk({}, this.center, this.color, this.radius);
       this.junks.push(newRect);
     }
   }
@@ -100,7 +54,7 @@ export default class Orbit {
       junk.position = new Point(x, y);
 
       if (junk.intersects(this.marsSurface)) {
-        this.addPoints(-1 * Math.floor(junk.area));
+        if (junk.area) this.addPoints(-1 * Math.floor(junk.area));
         junk.remove();
       } else newJunks.push(junk);
     });
@@ -125,8 +79,6 @@ export default class Orbit {
     this.junks = this.junks.sort((a, b) => a.angle - b.angle);
   }
 
-  
-
   onFrame(event) {
     // console.log(event);
     let { delta } = event;
@@ -142,10 +94,13 @@ export default class Orbit {
       this.sortJunks();
       const collisions = checkCollisions(this.junks);
 
-      if (collisions.length) {
+      if (this.junks.length && collisions.length) {
         collisions.forEach(([a, b]) => {
           if (this.junks.includes(a) && this.junks.includes(b)) {
-            const newJunks = breakUpCollision(a, b, this.genJunk, DESCENT_RATE);
+            const newJunks = breakUpCollision(a, b, this.center, DESCENT_RATE);
+            this.junks = this.junks.filter(
+              (j) => j.id !== a.id && j.id !== b.id,
+            );
             this.junks.push(...newJunks);
           }
         });
