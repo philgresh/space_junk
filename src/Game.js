@@ -1,5 +1,5 @@
-import { Path } from 'paper';
-import Orbit from './Orbit';
+import { Path, Point } from 'paper';
+import Orbit from './objs/Orbit';
 import {
   centerOfBBOX,
   extendLineFromMarsSurface,
@@ -25,8 +25,8 @@ export default class Game {
     this.orbits = [
       new Orbit({
         paperScope: this.paperScope,
-        numJunks: 10,
-        radius: 250,
+        numJunks: 20,
+        radius: 300,
         addPoints: this.addPoints,
       }),
       new Orbit({
@@ -35,14 +35,16 @@ export default class Game {
         radius: 500,
         color: 'green',
         addPoints: this.addPoints,
+        descentRateAccel: 2,
       }),
-      new Orbit({
-        paperScope: this.paperScope,
-        numJunks: 30,
-        radius: 750,
-        color: 'orange',
-        addPoints: this.addPoints,
-      }),
+      // new Orbit({
+      //   paperScope: this.paperScope,
+      //   numJunks: 30,
+      //   radius: 750,
+      //   color: 'orange',
+      //   addPoints: this.addPoints,
+      // descentRateAccel: 1.5,
+      // }),
     ];
 
     paperScope.view.onFrame = (e) => {
@@ -104,7 +106,10 @@ export default class Game {
     );
     const laser = new Path.Line(stationCenter, endpoint);
     laser.strokeColor = 'red';
-    laser.strokeWidth = 2;
+    laser.strokeWidth = 3;
+    laser.shadowColor = 'white';
+    laser.shadowBlur = 2;
+    laser.shadowOffset = new Point(0, 0);
     laser.angle = laser.segments[1].point.subtract(laser.segments[0].point);
     laser.visible = false;
     this.lasers.push(laser);

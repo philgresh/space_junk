@@ -8,9 +8,15 @@ const MAX_RECT_SIZE = 50;
 const ORBIT_RADIUS_RANGE = 50;
 
 const DELTA_ACCELERATE_FACTOR = 1 / 10;
-const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 30;
+const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 15;
 
-const genJunk = (params, center, color = COLOR, radius = RADIUS) => {
+const genJunk = (
+  params,
+  center,
+  color = COLOR,
+  radius = RADIUS,
+  descentRateAccel = 1,
+) => {
   const {
     altitude = genRandNum(
       radius - ORBIT_RADIUS_RANGE / 2,
@@ -18,7 +24,7 @@ const genJunk = (params, center, color = COLOR, radius = RADIUS) => {
     ),
     angle = genRandInt(0, 360),
     angleRate = genRandNum(-1, 1),
-    descentRate = DESCENT_RATE,
+    descentRate = descentRateAccel * DESCENT_RATE,
     theta = genRandAngle(),
     position = genPosFromTheta(center, theta, altitude),
     size = new Size(

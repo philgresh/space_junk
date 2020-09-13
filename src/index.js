@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import paper from 'paper';
 import Game from './Game';
 import Mars from './mars';

@@ -1,18 +1,16 @@
 import { Point, Path } from 'paper';
-import genJunk from './objs/utils/genJunk';
-import { genPosFromTheta } from './objs/utils/util';
-import {
-  checkCollisions,
-  breakUpCollision,
-} from './objs/utils/handleCollisions';
+import genJunk from './utils/genJunk';
+import { genPosFromTheta } from './utils/util';
+import { checkCollisions, breakUpCollision } from './utils/handleCollisions';
 
 const MARS_SURFACE_RADIUS = 125;
 
 const MAX_DELTA = 3;
 const STEPS = 10;
 const DELTA_ACCELERATE_FACTOR = 1 / 10;
-const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 25;
-const FRAMES_BETWEEN_COLLISION_CHECKS = 20;
+const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 15;
+const FRAMES_BETWEEN_COLLISION_CHECKS = 100;
+const THETA_RANGE = (Math.PI * 2) / 40;
 
 export default class Orbit {
   constructor(params) {
@@ -31,6 +29,11 @@ export default class Orbit {
       new Point(this.center),
       MARS_SURFACE_RADIUS,
     );
+    this.marsSurface.visible = false;
+    this.thetaMin = 0;
+    this.thetaMax = THETA_RANGE;
+    this.descentRate = (params.descentRateAccel || 1) * DESCENT_RATE;
+    this.thetaSorted = {};
   }
 
   drawOrbitCircle() {
@@ -76,35 +79,44 @@ export default class Orbit {
   }
 
   sortJunks() {
-    this.junks = this.junks.sort((a, b) => a.angle - b.angle);
+    this.junks = this.junks.sort((a, b) => a.theta - b.theta);
+  }
+
+  handleCollisions() {
+    const thisThetaRange = this.junks.filter((j) => {
+      const moddedTheta = j.theta % (2 * Math.PI);
+      if (moddedTheta > this.thetaMin && moddedTheta <= this.thetaMax)
+        return true;
+      return false;
+    });
+    const collisions = checkCollisions(thisThetaRange);
+
+    if (collisions.length) {
+      collisions.forEach(([a, b]) => {
+        const newJunks = breakUpCollision(a, b, this.center, this.descentRate);
+        this.junks.push(...newJunks);
+      });
+    }
   }
 
   onFrame(event) {
     // console.log(event);
     let { delta } = event;
-    if (event.count % FRAMES_BETWEEN_COLLISION_CHECKS !== 0) {
-      if (delta > MAX_DELTA) delta = MAX_DELTA;
-      delta *= DELTA_ACCELERATE_FACTOR;
 
-      for (let i = 0; i < STEPS; i += 1) {
-        // this.simulate(delta / STEPS);
-        this.simulate(delta);
-      }
-    } else {
+    if (event.count % FRAMES_BETWEEN_COLLISION_CHECKS === 0) {
+      this.thetaMin = (this.thetaMin + THETA_RANGE) % (2 * Math.PI);
+      this.thetaMax = (this.thetaMax + THETA_RANGE) % (2 * Math.PI);
+      this.handleCollisions();
+    }
+    if (event.count % (FRAMES_BETWEEN_COLLISION_CHECKS * 20) === 0)
       this.sortJunks();
-      const collisions = checkCollisions(this.junks);
 
-      if (this.junks.length && collisions.length) {
-        collisions.forEach(([a, b]) => {
-          if (this.junks.includes(a) && this.junks.includes(b)) {
-            const newJunks = breakUpCollision(a, b, this.center, DESCENT_RATE);
-            this.junks = this.junks.filter(
-              (j) => j.id !== a.id && j.id !== b.id,
-            );
-            this.junks.push(...newJunks);
-          }
-        });
-      }
+    if (delta > MAX_DELTA) delta = MAX_DELTA;
+    delta *= DELTA_ACCELERATE_FACTOR;
+
+    for (let i = 0; i < STEPS; i += 1) {
+      // this.simulate(delta / STEPS);
+      this.simulate(delta);
     }
   }
 }
