@@ -18,7 +18,7 @@ export default class Orbit {
     this.paperScope = params.paperScope;
     this.center = this.paperScope.view.center;
     this.radius = params.radius;
-    this.junks = [];
+    this.junks = params.junks;
     this.color = params.color || 'red';
     this.addPoints = params.addPoints;
 

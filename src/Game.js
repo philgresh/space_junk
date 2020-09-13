@@ -21,22 +21,24 @@ export default class Game {
     this.score = 0;
 
     this.addPoints = this.addPoints.bind(this);
-
+    this.junks = [];
     this.orbits = [
-      new Orbit({
-        paperScope: this.paperScope,
-        numJunks: 20,
-        radius: 300,
-        addPoints: this.addPoints,
-      }),
-      new Orbit({
-        paperScope: this.paperScope,
-        numJunks: 20,
-        radius: 500,
-        color: 'green',
-        addPoints: this.addPoints,
-        descentRateAccel: 2,
-      }),
+      // new Orbit({
+      //   paperScope: this.paperScope,
+      //   numJunks: 20,
+      //   radius: 300,
+      //   addPoints: this.addPoints,
+      // junks: this.junks,
+      // }),
+      // new Orbit({
+      //   paperScope: this.paperScope,
+      //   numJunks: 20,
+      //   radius: 500,
+      //   color: 'green',
+      //   addPoints: this.addPoints,
+      //   descentRateAccel: 2,
+      // junks: this.junks,
+      // }),
       // new Orbit({
       //   paperScope: this.paperScope,
       //   numJunks: 30,
@@ -44,6 +46,7 @@ export default class Game {
       //   color: 'orange',
       //   addPoints: this.addPoints,
       // descentRateAccel: 1.5,
+      // junks: this.junks,
       // }),
     ];
 
@@ -53,17 +56,59 @@ export default class Game {
     };
     this.lasers = [];
 
-    this.station1 = document.getElementById('station-1');
+    this.stationA = document.getElementById('stationA');
+    this.stationB = document.getElementById('stationB');
+    this.stationC = document.getElementById('stationC');
+
+    this.stations = [this.stationA, this.stationB, this.stationC];
+
+    this.currentStationIndex = 0;
+    this.currentStation = this.stations[this.currentStationIndex];
 
     document.addEventListener('keydown', (e) => {
+      switch (e.keyCode) {
+        case 38:
+          // ArrowUp
+          this.changeCurrentStation(1);
+          break;
+        case 40:
+          // ArrowDown
+          this.changeCurrentStation(-1);
+          break;
+        default:
+          break;
+      }
       if (e.keyCode === 32) {
-        this.addLaser();
+        this.fireWeapon();
       }
     });
     this.handleLaserDetonations = this.handleLaserDetonations.bind(this);
+    this.changeCurrentStation = this.changeCurrentStation.bind(this);
     this.drawLasers = this.drawLasers.bind(this);
+    this.fireWeapon = this.fireWeapon.bind(this);
     this.addPoints = this.addPoints.bind(this);
     this.addLaser = this.addLaser.bind(this);
+  }
+
+  changeCurrentStation(delta) {
+    this.currentStation.classList.remove('filter');
+    this.currentStationIndex =
+      (this.currentStationIndex + delta + this.stations.length) %
+      this.stations.length;
+    this.currentStation = this.stations[this.currentStationIndex];
+    this.currentStation.classList.add('filter');
+  }
+
+  fireWeapon() {
+    switch (this.currentStation) {
+      case 0: {
+        this.addLaser();
+        break;
+      }
+      default: {
+        this.addLaser();
+      }
+    }
   }
 
   addPoints(points) {
@@ -96,8 +141,7 @@ export default class Game {
   }
 
   addLaser() {
-    const stationA = document.getElementById('station-1');
-    const bbox = stationA.getClientRects()[0];
+    const bbox = this.stationA.getClientRects()[0];
     const stationCenter = centerOfBBOX(bbox);
     const [endpoint] = extendLineFromMarsSurface(
       this.center,
