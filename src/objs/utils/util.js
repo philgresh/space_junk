@@ -46,3 +46,29 @@ export const genPosFromTheta = (center, theta, altitude) => {
 export const withinXangle = (obj, baseAngle, range) => {
   return new Boolean(Math.abs(obj.angle - baseAngle) <= range / 2);
 };
+
+export const centerOfBBOX = (bbox) => {
+  const x = (bbox.right - bbox.left) / 2 + bbox.left;
+  const y = (bbox.bottom - bbox.top) / 2 + bbox.top;
+
+  return new Point(x, y);
+};
+
+export const extendLineFromMarsSurface = (center, bbox, distance) => {
+  const origin = new Point(center.x, center.y);
+  const station = centerOfBBOX(bbox);
+  const diff = station.subtract(origin);
+
+  const x = station.x + (diff.x / diff.length) * distance;
+  const y = station.y + (diff.y / diff.length) * distance;
+  return [new Point(x, y), diff];
+};
+
+export const outOfBounds = (position, view) => {
+  return (
+    position.x > view.width ||
+    position.x < 0 ||
+    position.y > view.height ||
+    position.x < 0
+  );
+};

@@ -5,7 +5,6 @@ import {
   genRandNum,
   genRandInt,
   genPosFromTheta,
-  withinXangle,
 } from './objs/utils/util';
 import {
   checkCollisions,
@@ -21,7 +20,9 @@ const MAX_DELTA = 3;
 const STEPS = 10;
 const DELTA_ACCELERATE_FACTOR = 1 / 10;
 const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 30;
+const FRAMES_BETWEEN_COLLISION_CHECKS = 200;
 const COLLISION_CHECK_ANGLE = (Math.PI * 2) / 18;
+const POINTS_DEDUCTION_MULTIPLIER = 1;
 
 export default class Orbit {
   constructor(params) {
@@ -31,6 +32,7 @@ export default class Orbit {
     this.radius = params.radius;
     this.junks = [];
     this.color = params.color || 'red';
+    this.addPoints = params.addPoints;
 
     this.genJunks(this.numJunks);
     this.sortJunks();
@@ -54,7 +56,7 @@ export default class Orbit {
         this.radius + ORBIT_RADIUS_RANGE / 2
       ),
       angle = genRandInt(0, 360),
-      angleRate = genRandNum(-1, 0.5) / 2,
+      angleRate = genRandNum(-1, 1),
       descentRate = DESCENT_RATE,
       theta = genRandAngle(),
       position = genPosFromTheta(this.center, theta, altitude),
@@ -87,7 +89,6 @@ export default class Orbit {
       const newRect = this.genJunk({});
       this.junks.push(newRect);
     }
-    console.log(this.junks);
   }
 
   updatePositions(delta) {
@@ -99,8 +100,8 @@ export default class Orbit {
       junk.position = new Point(x, y);
 
       if (junk.intersects(this.marsSurface)) {
+        this.addPoints(-1 * Math.floor(junk.area));
         junk.remove();
-        // subtract points
       } else newJunks.push(junk);
     });
     this.junks = newJunks;
@@ -124,10 +125,12 @@ export default class Orbit {
     this.junks = this.junks.sort((a, b) => a.angle - b.angle);
   }
 
+  
+
   onFrame(event) {
     // console.log(event);
     let { delta } = event;
-    if (event.count % 200 !== 0) {
+    if (event.count % FRAMES_BETWEEN_COLLISION_CHECKS !== 0) {
       if (delta > MAX_DELTA) delta = MAX_DELTA;
       delta *= DELTA_ACCELERATE_FACTOR;
 
