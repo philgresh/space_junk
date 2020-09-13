@@ -10,9 +10,9 @@
   </head>
 
   <body>
-    <canvas id="game-canvas" data-paper-resize="true"></canvas>
-    <div id="mars">
-      <img alt="Mars Polar Ice Cap" class="rotate" />
+    <div id="container">
+      <canvas id="game-canvas" data-paper-resize="true"></canvas>
+      <div id="mars" class="rotate"></div>
       <div class="station-parent">
         <svg height="100%" width="100%">
           <path
@@ -68,20 +68,20 @@
           </path>
         </svg>
       </div>
-    </div>
-    <div class="overlay"></div>
-    <div class="game-controls">
-      <div class="top">
-        <div class="score">SCORE:&nbsp;<span>0</span></div>
-        <div class="controls">
-          <button id="new-game" type="button">New Game</button>
+      <!-- <div class="overlay"></div> -->
+      <div class="game-controls">
+        <div class="top">
+          <div class="score">SCORE:&nbsp;<span>0</span></div>
+          <div class="controls">
+            <button id="new-game" type="button">New Game</button>
+          </div>
         </div>
-      </div>
-      <div class="bottom">
-        <div class="credits">BY PHIL</div>
-        <div class="instructions">
-          <button id="instructions" type="button">Instructions</button>
-          <button id="instructions" type="button">High Scores</button>
+        <div class="bottom">
+          <div class="credits">BY PHIL</div>
+          <div class="instructions">
+            <button id="instructions" type="button">Instructions</button>
+            <button id="instructions" type="button">High Scores</button>
+          </div>
         </div>
       </div>
     </div>

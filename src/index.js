@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   paperScope = paper.setup(marsCanvas);
   paper.install(window);
 
-  const mars = new Mars(paperScope);
+  // const mars = new Mars(paperScope);
 
   document.getElementById('new-game').addEventListener('click', setupNewGame);
 });
