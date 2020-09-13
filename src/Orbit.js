@@ -5,7 +5,6 @@ import {
   genRandNum,
   genRandInt,
   genPosFromTheta,
-  withinXangle,
 } from './objs/utils/util';
 import {
   checkCollisions,
@@ -125,6 +124,8 @@ export default class Orbit {
   sortJunks() {
     this.junks = this.junks.sort((a, b) => a.angle - b.angle);
   }
+
+  
 
   onFrame(event) {
     // console.log(event);
