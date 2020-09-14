@@ -6,7 +6,7 @@ import { checkCollisions, breakUpCollision } from './utils/handleCollisions';
 const MAX_DELTA = 3;
 const STEPS = 10;
 const DELTA_ACCELERATE_FACTOR = 1 / 30;
-const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 200;
+const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 300;
 const FRAMES_BETWEEN_COLLISION_CHECKS = 100;
 const THETA_RANGE = (Math.PI * 2) / 40;
 const MIN_AREA_SIDE = 5;

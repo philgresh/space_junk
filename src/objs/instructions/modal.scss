@@ -1,0 +1,120 @@
+#modal {
+  .modal-background {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 12;
+  }
+
+  .modal-child {
+    position: absolute;
+    top: 75%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    & .container {
+      position: relative;
+      width: 50vw;
+      background-color: #2e324491;
+      height: 35vh;
+      border-radius: 8px;
+      padding: 1rem;
+      color: #eee;
+
+      & div.close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0;
+        margin: 0;
+      }
+
+      & .title {
+        font-size: 2rem;
+        text-align: center;
+        padding: 0 1rem;
+      }
+
+      & p {
+        padding-top: 0.5rem;
+        line-height: 1.15;
+      }
+
+      & .credits {
+        position: absolute;
+        bottom: 1rem;
+      }
+
+      & .actions {
+        position: absolute;
+        bottom: 1rem;
+        width: 100%;
+
+        & .buttons {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-around;
+        }
+
+        .next,
+        .previous,
+        .play {
+          background-color: #52be80;
+          color: #111;
+        }
+      }
+
+      & .story {
+        & .storyline {
+          text-align: center;
+        }
+
+        & .technologies {
+          display: grid;
+          grid-template-columns: 1fr 4fr;
+          grid-template-rows: repeat(3, 2fr) 1fr;
+          justify-content: center;
+          align-items: center;
+          padding: 1rem;
+
+          & h3 {
+            margin: 0.25rem;
+          }
+
+          & p {
+            margin-top: 0.25rem;
+          }
+
+          .stationA {
+            fill: rgb(45, 179, 231);
+          }
+
+          .stationB {
+            fill: rgb(238, 225, 44);
+          }
+
+          .stationC {
+            fill: rgb(236, 65, 122);
+          }
+        }
+
+        & > .hidden {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+.credits {
+  font-size: 1rem;
+  color: #eee;
+  .fab,
+  .far {
+    font-size: 1rem;
+    color: #eee;
+  }
+}

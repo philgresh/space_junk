@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import paper from 'paper';
 import Game from './Game';
+import { setupModalListeners } from './objs/instructions/modal';
 
 require('./assets/css/normalize.css');
 require('./assets/css/styles.scss');
@@ -23,4 +24,5 @@ document.addEventListener('DOMContentLoaded', () => {
   paper.install(window);
 
   document.getElementById('new-game').addEventListener('click', setupNewGame);
+  setupModalListeners();
 });
