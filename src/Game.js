@@ -166,7 +166,8 @@ export default class Game {
   }
 
   addCannonBall() {
-    const nodes = this.stationC.childNodes;
+    const station = this.stationC;
+    const nodes = station.childNodes;
     let nodeIndex = 0;
     if (nodes.length > 1) nodeIndex = 1;
     const bbox = nodes[nodeIndex].getBoundingClientRect();
