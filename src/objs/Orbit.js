@@ -3,14 +3,14 @@ import genJunk from './utils/genJunk';
 import { genPosFromTheta } from './utils/util';
 import { checkCollisions, breakUpCollision } from './utils/handleCollisions';
 
-const MARS_SURFACE_RADIUS = 125;
-
 const MAX_DELTA = 3;
 const STEPS = 10;
-const DELTA_ACCELERATE_FACTOR = 1 / 10;
-const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 15;
+const DELTA_ACCELERATE_FACTOR = 1 / 30;
+const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 200;
 const FRAMES_BETWEEN_COLLISION_CHECKS = 100;
 const THETA_RANGE = (Math.PI * 2) / 40;
+const MIN_AREA_SIDE = 5;
+const MIN_AREA = MIN_AREA_SIDE ** 2;
 
 export default class Orbit {
   constructor(params) {
@@ -21,19 +21,22 @@ export default class Orbit {
     this.junks = params.junks;
     this.color = params.color || 'red';
     this.addPoints = params.addPoints;
+    this.marsSurface = params.marsSurface;
 
-    this.genJunks(this.numJunks);
-    this.sortJunks();
-    // this.drawOrbitCircle();
-    this.marsSurface = new Path.Circle(
-      new Point(this.center),
-      MARS_SURFACE_RADIUS,
-    );
     this.marsSurface.visible = false;
     this.thetaMin = 0;
     this.thetaMax = THETA_RANGE;
     this.descentRate = (params.descentRateAccel || 1) * DESCENT_RATE;
     this.thetaSorted = {};
+
+    this.handleCollisions = this.handleCollisions.bind(this);
+    this.genJunks = this.genJunks.bind(this);
+    this.updatePositions = this.updatePositions.bind(this);
+    this.rotateJunks = this.rotateJunks.bind(this);
+    this.simulate = this.simulate.bind(this);
+    this.onFrame = this.onFrame.bind(this);
+
+    this.genJunks(this.numJunks);
   }
 
   drawOrbitCircle() {
@@ -51,15 +54,27 @@ export default class Orbit {
   updatePositions(delta) {
     const newJunks = [];
     this.junks.forEach((junk) => {
-      junk.theta -= (delta * MARS_SURFACE_RADIUS) / junk.altitude;
-      junk.altitude -= delta * junk.descentRate;
-      const { x, y } = genPosFromTheta(this.center, junk.theta, junk.altitude);
-      junk.position = new Point(x, y);
-
-      if (junk.intersects(this.marsSurface)) {
-        if (junk.area) this.addPoints(-1 * Math.floor(junk.area));
+      if (!junk.visible || junk.area <= MIN_AREA) {
+        junk.visible = false;
         junk.remove();
-      } else newJunks.push(junk);
+      } else {
+        const marsSurfaceRadius = this.marsSurface.bounds.width;
+        junk.theta += 2 * Math.PI;
+        junk.theta -= (delta * marsSurfaceRadius) / junk.altitude;
+        junk.theta %= 2 * Math.PI;
+        junk.altitude -= delta * junk.descentRate;
+        const { x, y } = genPosFromTheta(
+          this.center,
+          junk.theta,
+          junk.altitude,
+        );
+        junk.position = new Point(x, y);
+
+        if (junk.intersects(this.marsSurface)) {
+          if (junk.area) this.addPoints(-1 * Math.floor(junk.area));
+          junk.remove();
+        } else newJunks.push(junk);
+      }
     });
     this.junks = newJunks;
   }
@@ -76,10 +91,6 @@ export default class Orbit {
     this.radius -= delta;
     this.updatePositions(delta);
     this.rotateJunks(delta);
-  }
-
-  sortJunks() {
-    this.junks = this.junks.sort((a, b) => a.theta - b.theta);
   }
 
   handleCollisions() {
@@ -108,8 +119,6 @@ export default class Orbit {
       this.thetaMax = (this.thetaMax + THETA_RANGE) % (2 * Math.PI);
       this.handleCollisions();
     }
-    if (event.count % (FRAMES_BETWEEN_COLLISION_CHECKS * 20) === 0)
-      this.sortJunks();
 
     if (delta > MAX_DELTA) delta = MAX_DELTA;
     delta *= DELTA_ACCELERATE_FACTOR;

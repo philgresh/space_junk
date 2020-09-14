@@ -7,7 +7,7 @@ require('./assets/css/styles.scss');
 // require('./assets/images/mars_pole.jpg');
 // require('./assets/images/space.jpg');
 
-const marsCanvas = document.getElementById('game-canvas');
+const gameCanvas = document.getElementById('game-canvas');
 let paperScope = null;
 
 function setupNewGame() {
@@ -15,13 +15,11 @@ function setupNewGame() {
     paperScope.projects[1].remove();
   }
   paperScope.projects[0].clear();
-  console.log('clicked');
   const game = new Game(paperScope);
-  console.log(game);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  paperScope = paper.setup(marsCanvas);
+  paperScope = paper.setup(gameCanvas);
   paper.install(window);
 
   document.getElementById('new-game').addEventListener('click', setupNewGame);
