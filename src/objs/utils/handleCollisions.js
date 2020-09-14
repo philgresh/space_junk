@@ -3,6 +3,7 @@ import genJunk from './genJunk';
 
 const NEAREST_NEIGHBORS_TO_CHECK = 5;
 const MIN_AREA_SIDE = 5;
+const MIN_AREA = MIN_AREA_SIDE ** 2;
 const COLLISION_SIZE_DIVISION = 1.4;
 const MAX_ANGLE_RATE = 1.3;
 const MIN_ANGLE_RATE = -1.3;
@@ -21,13 +22,18 @@ export const checkCollisions = (junks) => {
   const collisions = [];
   const pairs = {};
   junks.forEach((junk, idx) => {
-    const neighbors = nearestNeighbors(junks, idx);
-    neighbors.forEach((neigh) => {
-      if (junk.intersects(neigh) && !pairs[neigh]) {
-        collisions.push([junk, neigh]);
-        pairs[neigh] = junk;
-      }
-    });
+    if (junk.area <= MIN_AREA) {
+      junk.visible = false;
+      junk.remove();
+    } else {
+      const neighbors = nearestNeighbors(junks, idx);
+      neighbors.forEach((neigh) => {
+        if (junk.intersects(neigh) && !pairs[neigh]) {
+          collisions.push([junk, neigh]);
+          pairs[neigh] = junk;
+        }
+      });
+    }
   });
   return collisions;
 };

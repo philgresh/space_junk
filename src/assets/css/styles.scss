@@ -71,6 +71,18 @@ canvas {
   }
 }
 
+#stationA {
+  fill: rgb(45, 179, 231);
+}
+
+#stationB {
+  fill: rgb(238, 225, 44);
+}
+
+#stationC {
+  fill: rgb(236, 65, 122);
+}
+
 .rotate {
   -webkit-animation: rotation 20s linear infinite;
   -moz-animation: rotation 20s linear infinite;
