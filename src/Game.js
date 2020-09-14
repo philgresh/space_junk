@@ -166,9 +166,10 @@ export default class Game {
   }
 
   addCannonBall() {
-    const station = this.stationC;
-    debugger;
-    const bbox = station.childNodes[1].getBoundingClientRect();
+    const nodes = this.stationC.childNodes;
+    let nodeIndex = 0;
+    if (nodes.length > 0) nodeIndex = 1;
+    const bbox = nodes[nodeIndex].getBoundingClientRect();
     const stationCenter = centerOfBBOX(bbox);
 
     const [endpoint] = extendLineFromMarsSurface(
@@ -231,7 +232,10 @@ export default class Game {
   }
 
   addLightning() {
-    const bbox = this.stationB.childNodes[1].getBoundingClientRect();
+    const nodes = this.stationB.childNodes;
+    let nodeIndex = 0;
+    if (nodes.length > 0) nodeIndex = 1;
+    const bbox = nodes[nodeIndex].getBoundingClientRect();
     const stationCenter = centerOfBBOX(bbox);
     const [endpoint] = extendLineFromMarsSurface(
       this.center,
@@ -314,7 +318,10 @@ export default class Game {
   }
 
   addLaser() {
-    const bbox = this.stationA.childNodes[1].getBoundingClientRect();
+    const nodes = this.stationA.childNodes;
+    let nodeIndex = 0;
+    if (nodes.length > 0) nodeIndex = 1;
+    const bbox = nodes[nodeIndex].getBoundingClientRect();
     const stationCenter = centerOfBBOX(bbox);
     const [endpoint] = extendLineFromMarsSurface(
       this.center,
