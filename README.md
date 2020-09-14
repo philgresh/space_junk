@@ -14,5 +14,10 @@ Players can cycle between 3 technologies to destroy space junk circling around t
 
 Players rack up points for destroying debris and lose points for debris that hits the planet.
 
+### Room for improvement
+[ ] The lasers and cannonballs don't seem to break anything up or destroy them
+[ ] The static discharge is *too* powerful. May introduce a "charging" limitation (can only fire after fully charged, say 10s?)
+[ ] The quantity and attributes of debris are tunable and can use some attention
+[ ] Styling could be better than solid-color rectangles. Let's throw some oblongs in there!
 
 [Live link](https://philgresh.github.io/space_junk/)
