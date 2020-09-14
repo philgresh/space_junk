@@ -95,8 +95,6 @@ export const setupModalListeners = () => {
   modalBackground.addEventListener('click', closeM);
   closeButton.addEventListener('click', closeM);
   instructionsButton.addEventListener('click', () => {
-    story.dataset.currentPage = 1;
-    hideOtherPages(story.dataset.totalPages, 1);
     storyInitialState(story, actions);
     openModal(modal, gameControls);
   });

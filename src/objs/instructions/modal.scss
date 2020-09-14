@@ -72,7 +72,7 @@
           text-align: center;
         }
 
-        & .technologies {
+        & .grid {
           display: grid;
           grid-template-columns: 1fr 4fr;
           grid-template-rows: repeat(3, 2fr) 1fr;
