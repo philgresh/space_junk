@@ -15,9 +15,7 @@ function setupNewGame() {
     paperScope.projects[1].remove();
   }
   paperScope.projects[0].clear();
-  console.log('clicked');
   const game = new Game(paperScope);
-  console.log(game);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

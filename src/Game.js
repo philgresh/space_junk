@@ -13,6 +13,7 @@ import {
 
 const LASER_LENGTH = 20;
 const LASER_SPEED = 20;
+const MARS_SURFACE_RADIUS = 125;
 
 export default class Game {
   constructor(paperScope) {
@@ -21,7 +22,17 @@ export default class Game {
     this.score = 0;
 
     this.addPoints = this.addPoints.bind(this);
+    this.handleLaserDetonations = this.handleLaserDetonations.bind(this);
+    this.changeCurrentStation = this.changeCurrentStation.bind(this);
+    this.drawLasers = this.drawLasers.bind(this);
+    this.fireWeapon = this.fireWeapon.bind(this);
+    this.addLaser = this.addLaser.bind(this);
+
     this.junks = [];
+    this.marsSurface = new Path.Circle(
+      new Point(this.center),
+      MARS_SURFACE_RADIUS,
+    );
     this.orbits = [
       new Orbit({
         paperScope: this.paperScope,
@@ -29,6 +40,7 @@ export default class Game {
         radius: 400,
         addPoints: this.addPoints,
         junks: this.junks,
+        marsSurface: this.marsSurface,
       }),
       new Orbit({
         paperScope: this.paperScope,
@@ -38,6 +50,7 @@ export default class Game {
         addPoints: this.addPoints,
         descentRateAccel: 2,
         junks: this.junks,
+        marsSurface: this.marsSurface,
       }),
       new Orbit({
         paperScope: this.paperScope,
@@ -47,12 +60,16 @@ export default class Game {
         addPoints: this.addPoints,
         descentRateAccel: 1.5,
         junks: this.junks,
+        marsSurface: this.marsSurface,
       }),
     ];
 
     paperScope.view.onFrame = (e) => {
+      const { delta } = e;
       this.orbits.forEach((o) => o.onFrame(e));
-      this.onFrame(e);
+
+      this.handleLaserDetonations();
+      this.drawLasers(delta);
     };
     this.lasers = [];
 
@@ -82,15 +99,10 @@ export default class Game {
         this.fireWeapon();
       }
     });
-    this.handleLaserDetonations = this.handleLaserDetonations.bind(this);
-    this.changeCurrentStation = this.changeCurrentStation.bind(this);
-    this.drawLasers = this.drawLasers.bind(this);
-    this.fireWeapon = this.fireWeapon.bind(this);
-    this.addPoints = this.addPoints.bind(this);
-    this.addLaser = this.addLaser.bind(this);
   }
 
   changeCurrentStation(delta) {
+    // debugger;
     this.currentStation.classList.remove('filter');
     this.currentStationIndex =
       (this.currentStationIndex + delta + this.stations.length) %
@@ -141,7 +153,7 @@ export default class Game {
   }
 
   addLaser() {
-    const bbox = this.stationA.getClientRects()[0];
+    const bbox = this.stationA.childNodes[1].getClientRects()[0];
     const stationCenter = centerOfBBOX(bbox);
     const [endpoint] = extendLineFromMarsSurface(
       this.center,
@@ -151,30 +163,25 @@ export default class Game {
     const laser = new Path.Line(stationCenter, endpoint);
     laser.strokeColor = 'red';
     laser.strokeWidth = 3;
-    laser.shadowColor = 'white';
-    laser.shadowBlur = 2;
-    laser.shadowOffset = new Point(0, 0);
+    // laser.shadowColor = 'white';
+    // laser.shadowBlur = 2;
+    // laser.shadowOffset = new Point(0, 0);
     laser.angle = laser.segments[1].point.subtract(laser.segments[0].point);
-    laser.visible = false;
+    // laser.visible = false;
     this.lasers.push(laser);
   }
 
   handleLaserDetonations() {
-    this.orbits.forEach((orbit) => {
-      const collisions = checkCollisions(orbit.junks, this.lasers);
+    const that = this;
+    that.orbits.forEach((orbit) => {
+      const collisions = checkCollisions(orbit.junks, that.lasers);
       if (collisions.length) {
         collisions.forEach(([junk, laser]) => {
           removeLaser(laser);
           const points = destroyOrDiminishJunk(junk);
-          this.addPoints(points);
+          that.addPoints(points);
         });
       }
     });
-  }
-
-  onFrame(e) {
-    const { delta } = e;
-    this.drawLasers(delta);
-    this.handleLaserDetonations();
   }
 }

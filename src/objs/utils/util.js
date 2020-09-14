@@ -44,7 +44,7 @@ export const genPosFromTheta = (center, theta, altitude) => {
 };
 
 export const withinXangle = (obj, baseAngle, range) => {
-  return new Boolean(Math.abs(obj.angle - baseAngle) <= range / 2);
+  return Math.abs(obj.angle - baseAngle) <= range / 2;
 };
 
 export const centerOfBBOX = (bbox) => {
