@@ -72,3 +72,17 @@ export const outOfBounds = (position, view) => {
     position.x < 0
   );
 };
+
+const absoluteDistFromPoint = (a, b) =>
+  Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+
+export const getJunksWithinCircle = (circle, junks) => {
+  const theseJunks = junks.filter((j) => {
+    if (j.visible && (circle.intersects(j) || j.isInside(circle.bounds)))
+      return true;
+    return false;
+  });
+  return theseJunks.sort((a, b) =>
+    absoluteDistFromPoint(centerOfBBOX(a.bounds), centerOfBBOX(b.bounds)),
+  );
+};

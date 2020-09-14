@@ -46,7 +46,9 @@ export default class Orbit {
     const newJunks = [];
     this.junks.forEach((junk) => {
       const marsSurfaceRadius = this.marsSurface.bounds.width;
+      junk.theta += 2 * Math.PI;
       junk.theta -= (delta * marsSurfaceRadius) / junk.altitude;
+      junk.theta %= 2 * Math.PI;
       junk.altitude -= delta * junk.descentRate;
       const { x, y } = genPosFromTheta(this.center, junk.theta, junk.altitude);
       junk.position = new Point(x, y);

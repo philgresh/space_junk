@@ -13,7 +13,7 @@ body {
   margin: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 2;
+  z-index: -1;
 
   &[resize] {
     width: 100vw;
@@ -61,7 +61,7 @@ canvas {
     top: 0;
     width: 400px;
     height: 400px;
-    z-index: 2;
+    z-index: 3;
 
     & .station {
       position: absolute;

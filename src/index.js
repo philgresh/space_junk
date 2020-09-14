@@ -7,7 +7,7 @@ require('./assets/css/styles.scss');
 // require('./assets/images/mars_pole.jpg');
 // require('./assets/images/space.jpg');
 
-const marsCanvas = document.getElementById('game-canvas');
+const gameCanvas = document.getElementById('game-canvas');
 let paperScope = null;
 
 function setupNewGame() {
@@ -19,7 +19,7 @@ function setupNewGame() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  paperScope = paper.setup(marsCanvas);
+  paperScope = paper.setup(gameCanvas);
   paper.install(window);
 
   document.getElementById('new-game').addEventListener('click', setupNewGame);
