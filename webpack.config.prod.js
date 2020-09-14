@@ -3,8 +3,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-
 module.exports = {
   context: __dirname,
   entry: './src/index.js',
@@ -14,7 +12,6 @@ module.exports = {
   },
   module: {
     rules: [
-      
       {
         test: [/\.js?$/],
         exclude: /(node_modules)/,
@@ -26,6 +23,10 @@ module.exports = {
         },
       },
       {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
+      {
         test: /\.module\.s(a|c)ss$/,
         loader: [
           MiniCssExtractPlugin.loader,
@@ -33,13 +34,13 @@ module.exports = {
             loader: 'css-loader',
             options: {
               modules: true,
-              sourceMap: isDevelopment,
+              sourceMap: true,
             },
           },
           {
             loader: 'sass-loader',
             options: {
-              sourceMap: isDevelopment,
+              sourceMap: true,
             },
           },
         ],
@@ -53,7 +54,7 @@ module.exports = {
           {
             loader: 'sass-loader',
             options: {
-              sourceMap: isDevelopment,
+              sourceMap: true,
             },
           },
         ],
@@ -70,10 +71,10 @@ module.exports = {
                 quality: 65,
               },
               optipng: {
-                enabled: !isDevelopment,
+                enabled: true,
               },
               pngquant: {
-                quality: '65-90',
+                quality: [0.65, 0.9],
                 speed: 4,
               },
               gifsicle: {
@@ -90,8 +91,8 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: isDevelopment ? '[name].css' : '[name].[hash].css',
-      chunkFilename: isDevelopment ? '[id].css' : '[id].[hash].css',
+      filename: '[name].css',
+      chunkFilename: '[id].css',
     }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
