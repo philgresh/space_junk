@@ -4,6 +4,42 @@ body {
   background-size: cover;
   margin: 0;
   padding: 0;
+  font-family: 'Cantarell', sans-serif;
+}
+
+$btnColor: cadetblue;
+
+h1,
+h2,
+h3,
+.title {
+  font-family: 'Sonsie One', cursive;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  &:hover {
+    border-bottom: 1px dotted #eee;
+  }
+}
+
+button {
+  padding: 0.25em 0.75em;
+  // min-width: 10ch;
+  // min-height: 44px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #222;
+  text-align: center;
+  line-height: 1.1;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.18);
+  transition: 220ms all ease-in-out;
+
+  background-color: $btnColor;
+  &:hover {
+    background-color: scale-color($btnColor, $lightness: -20%);
+  }
 }
 
 #game-canvas {
@@ -126,11 +162,7 @@ canvas {
   offset-rotate: auto;
 }
 
-.hidden {
-  display: none;
-}
-
-.game-controls {
+#game-controls {
   position: absolute;
   top: 0;
   left: 0;
@@ -142,7 +174,7 @@ canvas {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  z-index: 10;
+  z-index: 11;
 
   & .top,
   & .bottom {
@@ -164,6 +196,13 @@ canvas {
   & .bottom {
     color: #eee;
   }
+  & .hidden {
+    display: none;
+  }
+}
+
+.hidden {
+  display: none;
 }
 
 .filter {

@@ -3,34 +3,148 @@
   <meta charset="utf-8" />
 
   <head>
+    <script
+      src="https://kit.fontawesome.com/5234f0ad7f.js"
+      crossorigin="anonymous"
+    ></script>
     <link rel="stylesheet" type="text/css" href="main.css" />
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
-    <!-- <script src="keymaster.js"></script> -->
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cantarell:ital,wght@0,400;0,700;1,400&family=Sonsie+One&display=swap"
+      rel="stylesheet"
+    />
     <title>Space Junk Eliminator!</title>
   </head>
 
   <body>
+    <div id="modal">
+      <div class="modal-background">
+        <div class="modal-child">
+          <div class="container">
+            <div class="close">
+              <button role="button" aria-roledescription="Close modal">
+                &times;
+              </button>
+            </div>
+            <div class="story" data-current-page="1" data-total-pages="3">
+              <div class="storyline" data-story-page="1">
+                <h1 class="title">Space Junk Eliminator!</h1>
+                <p>
+                  Humans have successfully, but recklessly, colonized Mars.
+                  There is now so much space junk floating around the planet
+                  that it will soon become impossible to receive any resupplies!
+                </p>
+                <p>
+                  Defend your homeworld using the newest Martian technology!
+                </p>
+              </div>
+              <div class="technologies grid hidden" data-story-page="2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 100 100"
+                  height="25px"
+                  class="stationA"
+                >
+                  <polygon points="50 15, 100 100, 0 100" />
+                </svg>
+                <div>
+                  <h3>Laser</h3>
+                  <p>
+                    Definitely destroys the smallest debris. Does not have much
+                    of an effect on larger pieces.
+                  </p>
+                </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 100 100"
+                  height="25px"
+                  class="stationB"
+                >
+                  <polygon points="50 15, 100 100, 0 100" />
+                </svg>
+                <div>
+                  <h3>Static Discharge</h3>
+                  <p>
+                    Martians are huge fans of Thor. Destroys almost everything
+                    within its discharge radius.
+                  </p>
+                </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 100 100"
+                  height="25px"
+                  class="stationC"
+                >
+                  <polygon points="50 15, 100 100, 0 100" />
+                </svg>
+                <div>
+                  <h3>Hyperkinetic cannonballs</h3>
+                  <p>
+                    If it ain't broke...break up larger pieces of debris by
+                    launching heavy things at them.
+                  </p>
+                </div>
+              </div>
+              <div class="button-actions hidden" data-story-page="3">
+                <h2>Actions</h2>
+                <div class="grid">
+                  <span
+                    ><i class="fas fa-arrow-up"></i>&nbsp;&nbsp;<i
+                      class="fas fa-arrow-down"
+                    ></i
+                  ></span>
+                  <div>
+                    <p></p>
+                    <h3>Cycle through technologies</h3>
+                    <p></p>
+                  </div>
+                  <span class="spacebar">Spacebar</span>
+                  <div>
+                    <p></p>
+                    <h3>Fire!</h3>
+                    <p></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <div class="buttons">
+                <!-- <button class="previous" disabled>Previous</button> -->
+                <button class="next">Next</button>
+                <button class="play hidden">Play!</button>
+              </div>
+            </div>
+            <div class="credits">
+              <a href="https://github.com/philgresh/space_junk">
+                <i class="fab fa-github"></i>
+                <span>&nbsp;Repo</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="container">
       <canvas id="game-canvas" data-paper-resize="true"></canvas>
       <div id="mars">
         <div class="mars-pole rotate"></div>
         <div class="overlay"></div>
         <div class="station-parent rotate">
-          <svg height="100%" width="100%" id="stationA" class="station">
+          <svg height="100%" width="100%" id="stationA" class="station hidden">
             <path
               d="M 201.288 60 L 219.135 90 L 183.441 90 L 201.288 60 Z"
               bx:shape="triangle 183.441 74 35.694 30.913 0.5 0 1@9c3bf3d8"
               bx:origin="0.514344 3.234885"
             ></path>
           </svg>
-          <svg height="100%" width="100%" id="stationB" class="station">
+          <svg height="100%" width="100%" id="stationB" class="station hidden">
             <path
               d="M 297.716 241.892 L 315.563 272.805 L 279.869 272.805 L 297.716 241.892 Z"
               bx:shape="triangle 279.869 241.892 35.694 30.913 0.5 0 1@ad148cd3"
               bx:origin="-2.187174 -2.196228"
             ></path>
           </svg>
-          <svg height="100%" width="100%" id="stationC" class="station">
+          <svg height="100%" width="100%" id="stationC" class="station hidden">
             <path
               d="M 103.847 243.087 L 121.694 274 L 86 274 L 103.847 243.087 Z"
               bx:shape="triangle 86 243.087 35.694 30.913 0.5 0 1@1496c6a1"
@@ -40,7 +154,7 @@
         </div>
       </div>
 
-      <div class="game-controls">
+      <div id="game-controls">
         <div class="top">
           <div class="score">SCORE:&nbsp;<span>0</span></div>
           <div class="controls">
@@ -48,10 +162,18 @@
           </div>
         </div>
         <div class="bottom">
-          <div class="credits">BY PHIL</div>
+          <div class="credits">
+            <a href="https://github.com/philgresh/">
+              <i class="fab fa-github"></i>
+              &nbsp;philgres
+            </a>
+            &nbsp; &nbsp;
+            <a href="https://www.linkedin.com/in/philgresham"
+              ><i class="fab fa-linkedin"></i>/philgresham</a
+            >
+          </div>
           <div class="instructions">
             <button id="instructions" type="button">Instructions</button>
-            <button id="instructions" type="button">High Scores</button>
           </div>
         </div>
       </div>
