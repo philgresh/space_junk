@@ -10,7 +10,7 @@ const ORBIT_RADIUS_RANGE = 50;
 const DELTA_ACCELERATE_FACTOR = 1 / 10;
 const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 15;
 
-const genJunk = (
+const genObj = (
   params,
   center,
   color = COLOR,
@@ -50,4 +50,4 @@ const genJunk = (
   return newRect;
 };
 
-export default genJunk;
+export default genObj;
