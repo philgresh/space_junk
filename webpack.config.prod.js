@@ -2,6 +2,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 module.exports = {
   context: __dirname,
@@ -100,6 +101,12 @@ module.exports = {
       inject: true,
       template: path.resolve(__dirname, 'src', 'index.html'),
     }),
+    // new FaviconsWebpackPlugin({
+    //   logo: './src/assets/images/favicon-32x32.png',
+    //   icons: {
+    //     favicons: true,
+    //   },
+    // }),
   ],
   devtool: 'source-map',
   resolve: {

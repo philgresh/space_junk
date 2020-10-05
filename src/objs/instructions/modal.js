@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 require('./modal.scss');
 
 export const closeModal = (modal, gameControls, stations) => {
