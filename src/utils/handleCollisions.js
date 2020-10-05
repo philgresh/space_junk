@@ -1,5 +1,5 @@
 import { Size } from 'paper';
-import genJunk from './genJunk';
+import genObj from './genObj';
 
 const NEAREST_NEIGHBORS_TO_CHECK = 5;
 const MIN_AREA_SIDE = 5;
@@ -8,29 +8,29 @@ const COLLISION_SIZE_DIVISION = 1.4;
 const MAX_ANGLE_RATE = 1.3;
 const MIN_ANGLE_RATE = -1.3;
 
-const nearestNeighbors = (junks, index, num = NEAREST_NEIGHBORS_TO_CHECK) => {
+const nearestNeighbors = (objs, index, num = NEAREST_NEIGHBORS_TO_CHECK) => {
   const neighbors = [];
   for (let i = -num; i < num; i += 1) {
-    const j = (index + i) % junks.length;
-    if (j !== index && junks.slice(j, j + 1)[0])
-      neighbors.push(junks.slice(j, j + 1)[0]);
+    const j = (index + i) % objs.length;
+    if (j !== index && objs.slice(j, j + 1)[0])
+      neighbors.push(objs.slice(j, j + 1)[0]);
   }
   return neighbors;
 };
 
-export const checkCollisions = (junks) => {
+export const checkCollisions = (objs) => {
   const collisions = [];
   const pairs = {};
-  junks.forEach((junk, idx) => {
-    if (junk.area <= MIN_AREA) {
-      junk.visible = false;
-      junk.remove();
+  objs.forEach((obj, idx) => {
+    if (obj.area <= MIN_AREA) {
+      obj.visible = false;
+      obj.remove();
     } else {
-      const neighbors = nearestNeighbors(junks, idx);
+      const neighbors = nearestNeighbors(objs, idx);
       neighbors.forEach((neigh) => {
-        if (junk.intersects(neigh) && !pairs[neigh]) {
-          collisions.push([junk, neigh]);
-          pairs[neigh] = junk;
+        if (obj.intersects(neigh) && !pairs[neigh]) {
+          collisions.push([obj, neigh]);
+          pairs[neigh] = obj;
         }
       });
     }
@@ -70,7 +70,7 @@ export const breakUpCollision = (a, b, center, DESCENT_RATE) => {
     size: b.size.divide(COLLISION_SIZE_DIVISION),
   });
 
-  const newJunk = genJunk(
+  const newObj = genObj(
     {
       altitude,
       angleRate,
@@ -86,5 +86,9 @@ export const breakUpCollision = (a, b, center, DESCENT_RATE) => {
     largerFillColor,
   );
 
-  return [newJunk];
+  const [newA, newB] = [a, b];
+  a.remove();
+  b.remove();
+
+  return [newObj, newA, newB];
 };

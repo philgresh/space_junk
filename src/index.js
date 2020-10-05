@@ -5,6 +5,7 @@ import { setupModalListeners } from './objs/instructions/modal';
 
 require('./assets/css/normalize.css');
 require('./assets/css/styles.scss');
+require('./assets/css/modal.scss');
 // require('./assets/images/mars_pole.jpg');
 // require('./assets/images/space.jpg');
 

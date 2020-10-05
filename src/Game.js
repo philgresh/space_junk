@@ -1,23 +1,31 @@
 import { Color, Path, Point } from 'paper';
-import Orbit from './objs/Orbit';
 import {
   centerOfBBOX,
   extendLineFromMarsSurface,
   outOfBounds,
-  getJunksWithinCircle,
-} from './objs/utils/util';
+  getObjsWithinCircle,
+  genPosFromTheta,
+} from './utils/util';
 import {
-  checkCollisions,
-  destroyOrDiminishJunk,
+  checkCollisions as checkLaserCollisions,
+  destroyOrDiminishObj,
   removeLaser,
-} from './objs/utils/handleLaserDetonation';
+} from './utils/handleLaserDetonation';
 import {
   checkCBCollisions,
-  destroyOrDiminishCBJunk,
+  destroyOrDiminishCBObj,
   removeCB,
-} from './objs/utils/handleCannonballCollisions';
+} from './utils/handleCannonballCollisions';
+import { checkCollisions, breakUpCollision } from './utils/handleCollisions';
+import genObj from './utils/genObj';
 
-const FRAMES_BETWEEN_COLLISION_CHECKS = 100;
+const stationA = document.getElementById('stationA');
+const stationB = document.getElementById('stationB');
+const stationC = document.getElementById('stationC');
+const stations = [stationA, stationB, stationC];
+
+const MAXOBJS = 100;
+const FRAMES_BETWEEN_COLLISION_CHECKS = 50;
 const LASER_LENGTH = 20;
 const LASER_SPEED = 20;
 const MARS_SURFACE_RADIUS = 125;
@@ -26,69 +34,71 @@ const LIGHTNING_EXIST_TIME = 300; // milliseconds
 const CANNON_START_DISTANCE = 20;
 const CANNON_BALL_RADIUS = 10;
 const CANNON_BALL_SPEED = 10;
+const MAX_DELTA = 3;
+const STEPS = 10;
+const DELTA_ACCELERATE_FACTOR = 1 / 30;
+const DESCENT_RATE = DELTA_ACCELERATE_FACTOR * 300;
+const THETA_RANGE = (Math.PI * 2) / 40;
+const MIN_AREA_SIDE = 5;
+const MIN_AREA = MIN_AREA_SIDE ** 2;
 
 export default class Game {
   constructor(paperScope) {
     this.paperScope = paperScope;
     this.center = paperScope.view.center;
     this.score = 0;
+    this.objs = [];
+    this.orbits = [
+      {
+        radius: 400,
+        numObjs: 40,
+        color: 'red',
+      },
+      // {
+      //   radius: 600,
+      //   numObjs: 60,
+      //   color: 'green',
+      // },
+    ];
 
-    this.addPoints = this.addPoints.bind(this);
-    this.handleLaserDetonations = this.handleLaserDetonations.bind(this);
+    this.drawOrbitCircle = this.drawOrbitCircle.bind(this);
+    this.genObjs = this.genObjs.bind(this);
+    this.updatePositions = this.updatePositions.bind(this);
+    this.rotateObjs = this.rotateObjs.bind(this);
+    this.simulate = this.simulate.bind(this);
+    this.handleCollisions = this.handleCollisions.bind(this);
+    this.onFrame = this.onFrame.bind(this);
+    this.sortObjs = this.sortObjs.bind(this);
+    this.changeCurrentStation = this.changeCurrentStation.bind(this);
+    this.determineKeydownAction = this.determineKeydownAction.bind(this);
+    this.fireWeapon = this.fireWeapon.bind(this);
+    this.addCannonBall = this.addCannonBall.bind(this);
+    this.drawCannonballs = this.drawCannonballs.bind(this);
     this.handleCannonballCollisions = this.handleCannonballCollisions.bind(
       this,
     );
-    this.determineKeydownAction = this.determineKeydownAction.bind(this);
-    this.changeCurrentStation = this.changeCurrentStation.bind(this);
     this.addLightning = this.addLightning.bind(this);
-    this.drawCannonballs = this.drawCannonballs.bind(this);
-    this.addCannonBall = this.addCannonBall.bind(this);
+    this.determineLightning = this.determineLightning.bind(this);
+    this.drawLightning = this.drawLightning.bind(this);
+    this.destroyLightning = this.destroyLightning.bind(this);
     this.drawLasers = this.drawLasers.bind(this);
-    this.fireWeapon = this.fireWeapon.bind(this);
     this.addLaser = this.addLaser.bind(this);
-    this.sortJunks = this.sortJunks.bind(this);
+    this.handleLaserDetonations = this.handleLaserDetonations.bind(this);
+    this.addPoints = this.addPoints.bind(this);
 
-    this.junks = [];
+    this.thetaMin = 0;
+    this.thetaMax = THETA_RANGE;
+    this.thetaSorted = {};
+
     this.marsSurface = new Path.Circle(
       new Point(this.center),
       MARS_SURFACE_RADIUS,
     );
-    this.orbits = [
-      new Orbit({
-        paperScope: this.paperScope,
-        numJunks: 20,
-        radius: 400,
-        addPoints: this.addPoints,
-        junks: this.junks,
-        marsSurface: this.marsSurface,
-      }),
-      new Orbit({
-        paperScope: this.paperScope,
-        numJunks: 20,
-        radius: 500,
-        color: 'green',
-        addPoints: this.addPoints,
-        descentRateAccel: 2,
-        junks: this.junks,
-        marsSurface: this.marsSurface,
-      }),
-      // new Orbit({
-      //   paperScope: this.paperScope,
-      //   numJunks: 30,
-      //   radius: 750,
-      //   color: 'orange',
-      //   addPoints: this.addPoints,
-      //   descentRateAccel: 1.5,
-      //   junks: this.junks,
-      //   marsSurface: this.marsSurface,
-      // }),
-    ];
+    this.marsSurface.visible = false;
 
     paperScope.view.onFrame = (e) => {
       const { delta } = e;
-      this.orbits.forEach((o) => {
-        o.onFrame(e);
-      });
+      this.onFrame(e);
 
       this.handleLaserDetonations();
       this.drawLasers(delta);
@@ -97,37 +107,127 @@ export default class Game {
       this.handleCannonballCollisions(delta);
 
       if (e.count % (FRAMES_BETWEEN_COLLISION_CHECKS * 20) === 0)
-        this.sortJunks();
+        this.sortObjs();
     };
 
     this.lightning = [];
     this.lasers = [];
     this.cannonballs = [];
 
-    this.stationA = document.getElementById('stationA');
-    this.stationB = document.getElementById('stationB');
-    this.stationC = document.getElementById('stationC');
-
-    this.stations = [this.stationA, this.stationB, this.stationC];
-
     this.currentStationIndex = 0;
-    this.currentStation = this.stations[this.currentStationIndex];
+    this.currentStation = stations[this.currentStationIndex];
 
     document.addEventListener('keydown', this.determineKeydownAction);
-    this.sortJunks();
+    this.genObjs();
+    this.drawOrbitCircle();
+    this.sortObjs();
   }
 
-  sortJunks() {
-    this.junks = this.junks.sort((a, b) => a.theta - b.theta);
+  drawOrbitCircle() {
+    const orbit1 = new Path.Circle(new Point(this.center), this.radius);
+    orbit1.strokeColor = this.color;
+  }
+
+  genObjs() {
+    this.orbits.forEach(({ numObjs, radius, color }) => {
+      for (let i = 0; i < numObjs; i += 1) {
+        const newRect = genObj({}, this.center, color, radius);
+        this.objs.push(newRect);
+      }
+    });
+  }
+
+  updatePositions(delta) {
+    const newObjs = [];
+    while (this.objs.length >= MAXOBJS) {
+      this.objs.shift();
+    }
+
+    this.objs.forEach((obj) => {
+      if (obj instanceof Array) {
+        // Not sure how objs are being converted to arrays...
+        obj[0].remove();
+      } else if (!obj.visible || obj.area <= MIN_AREA) {
+        obj.visible = false;
+        obj.remove();
+      } else {
+        const marsSurfaceRadius = this.marsSurface.bounds.width;
+        obj.theta += 2 * Math.PI;
+        obj.theta -= (delta * marsSurfaceRadius) / obj.altitude;
+        obj.theta %= 2 * Math.PI;
+        obj.altitude -= delta * obj.descentRate;
+        const { x, y } = genPosFromTheta(this.center, obj.theta, obj.altitude);
+        obj.position = new Point(x, y);
+
+        if (obj.intersects(this.marsSurface)) {
+          if (obj.area) this.addPoints(-1 * Math.floor(obj.area));
+          obj.remove();
+        } else newObjs.push(obj);
+      }
+    });
+    this.objs = newObjs;
+  }
+
+  rotateObjs() {
+    this.objs.forEach((obj) => {
+      const newAngle = (obj.angle + obj.angleRate) % 360;
+      obj.angle = newAngle;
+      obj.rotate(obj.angleRate);
+    });
+  }
+
+  simulate(delta) {
+    this.radius -= delta;
+    this.updatePositions(delta);
+    this.rotateObjs(delta);
+  }
+
+  handleCollisions() {
+    const thisThetaRange = this.objs.filter((j) => {
+      const moddedTheta = j.theta % (2 * Math.PI);
+      if (moddedTheta > this.thetaMin && moddedTheta <= this.thetaMax)
+        return true;
+      return false;
+    });
+    const collisions = checkCollisions(thisThetaRange);
+
+    if (collisions.length) {
+      collisions.forEach(([a, b]) => {
+        const newObjs = breakUpCollision(a, b, this.center, this.descentRate);
+        this.objs.push(...newObjs);
+      });
+    }
+  }
+
+  onFrame(event) {
+    // console.log(event);
+    let { delta } = event;
+
+    if (event.count % FRAMES_BETWEEN_COLLISION_CHECKS === 0) {
+      this.thetaMin = (this.thetaMin + THETA_RANGE) % (2 * Math.PI);
+      this.thetaMax = (this.thetaMax + THETA_RANGE) % (2 * Math.PI);
+      this.handleCollisions();
+    }
+
+    if (delta > MAX_DELTA) delta = MAX_DELTA;
+    delta *= DELTA_ACCELERATE_FACTOR;
+
+    for (let i = 0; i < STEPS; i += 1) {
+      // this.simulate(delta / STEPS);
+      this.simulate(delta);
+    }
+  }
+
+  sortObjs() {
+    this.objs = this.objs.sort((a, b) => a.theta - b.theta);
   }
 
   changeCurrentStation(delta) {
     // debugger;
     this.currentStation.classList.remove('filter');
     this.currentStationIndex =
-      (this.currentStationIndex + delta + this.stations.length) %
-      this.stations.length;
-    this.currentStation = this.stations[this.currentStationIndex];
+      (this.currentStationIndex + delta + stations.length) % stations.length;
+    this.currentStation = stations[this.currentStationIndex];
     this.currentStation.classList.add('filter');
   }
 
@@ -166,7 +266,7 @@ export default class Game {
   }
 
   addCannonBall() {
-    const station = this.stationC;
+    const station = stationC;
     const nodes = station.childNodes;
     let nodeIndex = 0;
     if (nodes.length > 1) nodeIndex = 1;
@@ -216,24 +316,17 @@ export default class Game {
   }
 
   handleCannonballCollisions() {
-    this.orbits.forEach((orbit) => {
-      const collisions = checkCBCollisions(orbit.junks, this.cannonballs);
-      if (collisions.length) {
-        collisions.forEach(([junk, cb]) => {
-          removeCB(cb);
-          destroyOrDiminishCBJunk(
-            junk,
-            this.junks,
-            this.center,
-            this.addPoints,
-          );
-        });
-      }
-    });
+    const collisions = checkCBCollisions(this.objs, this.cannonballs);
+    if (collisions.length) {
+      collisions.forEach(([obj, cb]) => {
+        removeCB(cb);
+        destroyOrDiminishCBObj(obj, this.objs, this.center, this.addPoints);
+      });
+    }
   }
 
   addLightning() {
-    const nodes = this.stationB.childNodes;
+    const nodes = stationB.childNodes;
     let nodeIndex = 0;
     if (nodes.length > 1) nodeIndex = 1;
     const bbox = nodes[nodeIndex].getBoundingClientRect();
@@ -247,32 +340,32 @@ export default class Game {
     const base = new Path.Line(stationCenter, endpoint);
     base.strokeColor = 'white';
     this.lightning.push(base);
-    const junksToDestroy = this.determineLightning(
+    const objsToDestroy = this.determineLightning(
       base,
       FIRST_LIGHTNING_STRIKE_DISTANCE / 2,
     );
-    junksToDestroy.forEach((j) => {
+    objsToDestroy.forEach((j) => {
       this.addPoints(j.area);
       j.visible = false;
       j.remove();
     });
   }
 
-  determineLightning(first, dist, junksToDestroy = []) {
+  determineLightning(first, dist, objsToDestroy = []) {
     const lastPoint = first.segments[1].point;
     const lightningCircle = new Path.Circle(lastPoint, dist);
-    const intersectingJunks = getJunksWithinCircle(lightningCircle, this.junks);
+    const intersectingObjs = getObjsWithinCircle(lightningCircle, this.objs);
 
-    intersectingJunks.forEach((j) => {
-      if (!junksToDestroy.includes(j)) {
-        junksToDestroy.push(j);
-        const junkCenter = centerOfBBOX(j.bounds);
-        const newLightning = new Path.Line(lastPoint, junkCenter);
+    intersectingObjs.forEach((j) => {
+      if (!objsToDestroy.includes(j)) {
+        objsToDestroy.push(j);
+        const objCenter = centerOfBBOX(j.bounds);
+        const newLightning = new Path.Line(lastPoint, objCenter);
         this.lightning.push(newLightning);
-        this.determineLightning(newLightning, dist / 2, junksToDestroy);
+        this.determineLightning(newLightning, dist / 2, objsToDestroy);
       }
     });
-    return junksToDestroy;
+    return objsToDestroy;
   }
 
   drawLightning() {
@@ -319,7 +412,7 @@ export default class Game {
   }
 
   addLaser() {
-    const nodes = this.stationA.childNodes;
+    const nodes = stationA.childNodes;
     let nodeIndex = 0;
     if (nodes.length > 1) nodeIndex = 1;
     const bbox = nodes[nodeIndex].getBoundingClientRect();
@@ -337,17 +430,14 @@ export default class Game {
   }
 
   handleLaserDetonations() {
-    const that = this;
-    that.orbits.forEach((orbit) => {
-      const collisions = checkCollisions(orbit.junks, that.lasers);
-      if (collisions.length) {
-        collisions.forEach(([junk, laser]) => {
-          removeLaser(laser);
-          const points = destroyOrDiminishJunk(junk);
-          that.addPoints(points);
-        });
-      }
-    });
+    const collisions = checkLaserCollisions(this.objs, this.lasers);
+    if (collisions.length) {
+      collisions.forEach(([obj, laser]) => {
+        removeLaser(laser);
+        const points = destroyOrDiminishObj(obj);
+        this.addPoints(points);
+      });
+    }
   }
 
   addPoints(points) {
